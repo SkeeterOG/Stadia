@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+
+        android:id="@+id/iv_bluetooth"
+        android:layout_width="@dimen/_110sdp"
+        android:layout_height="@dimen/_110sdp"
+        android:layout_margin="@dimen/_16sdp"
+        android:background="@drawable/bluetooth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </ImageView>
+
+    <TextView
+        android:id="@+id/tv_tapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_12sdp"
+        android:layout_marginTop="12dp"
+        android:text="@string/tap_button_to_connect_to_stadia_via_bluetooth"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/iv_bluetooth" />
+
+    <View
+        android:id="@+id/view_divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="8dp"
+        android:background="#DDDADA"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_tapButton" />
+
+    <TextView
+        android:id="@+id/tv_connectiontext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+
+        android:layout_marginStart="@dimen/_12sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_6sdp"
+        android:text="@string/once_connected_press_calibrate_button_to_automatically_calculate_offset_height"
+        android:textColor="#000000"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_divider" />
+
+    <Button
+        android:id="@+id/btn_calibrate"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_14sdp"
+        android:text="@string/calibrate"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_connectiontext" />
+
+    <View
+        android:id="@+id/view_space"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_6sdp"
+        android:layout_marginEnd="@dimen/_6sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_calibrate" />
+
+    <TextView
+        android:id="@+id/tv_manuallyEnter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_10sdp"
+        android:text="@string/manually_enter_it_yourself_in_inches"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view_space" />
+
+    <EditText
+        android:id="@+id/et_inches"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Inches"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:gravity="center_horizontal"
+
+        app:layout_constraintEnd_toEndOf="@id/tv_manuallyEnter"
+        app:layout_constraintStart_toStartOf="@+id/tv_manuallyEnter"
+        app:layout_constraintTop_toBottomOf="@id/tv_manuallyEnter" />
+
+    <Button
+        android:id="@+id/btn_enter"
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_14sdp"
+        android:text="@string/enter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_inches" />
+
+    <Button
+        android:id="@+id/btn_runstadia"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_28sdp"
+        android:layout_marginTop="@dimen/_14sdp"
+        android:layout_marginEnd="@dimen/_28sdp"
+        android:background="@drawable/bg_btn_run"
+        android:text="@string/run_stadia"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_enter" />
+
+    <Button
+        android:id="@+id/btn_settings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_28sdp"
+        android:layout_marginTop="@dimen/_14sdp"
+        android:layout_marginEnd="@dimen/_28sdp"
+        android:background="@drawable/bg_btn_settings"
+        android:text="@string/settings"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_runstadia" />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
