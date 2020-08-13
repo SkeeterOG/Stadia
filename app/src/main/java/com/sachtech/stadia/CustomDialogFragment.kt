@@ -1,23 +1,66 @@
 package com.sachtech.stadia
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sachtech.stadia.BluetoothHelper.bReciever
+import com.sachtech.stadia.utils.BluetoothConnector
 import kotlinx.android.synthetic.main.custom_fragment.*
 import kotlinx.android.synthetic.main.custom_fragment.view.*
-import kotlinx.android.synthetic.main.item_custom_fragment.*
-import kotlinx.android.synthetic.main.item_custom_fragment.view.*
+import java.io.IOException
 
-
-class CustomDialogFragment : DialogFragment() {
+class CustomDialogFragment : DialogFragment(), NextViewListener {
     var deviceItemList = ArrayList<BluetoothDevice>()
+    private var nextViewListener: NextViewListener? = null
+
+    /**
+     * Broadcast Receiver that detects bond state changes (Pairing status changes)
+     */
+    private val pairedBluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            if (action == BluetoothDevice.ACTION_BOND_STATE_CHANGED) {
+                val mDevice =
+                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                //3 cases:
+                //case1: bonded already
+                if (mDevice?.bondState == BluetoothDevice.BOND_BONDED) {
+                    Log.d("", "BroadcastReceiver: BOND_BONDED.")
+                    // bleUtils.run(mDevice,getActivity());
+                    val connector =
+                        BluetoothConnector(
+                            mDevice, true,
+                            BluetoothHelper.bluetoothAdapter, null, nextViewListener
+                        )
+                    try {
+                        connector.connect()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+                //case2: creating a bone
+                if (mDevice?.bondState == BluetoothDevice.BOND_BONDING) {
+                    Log.d("", "BroadcastReceiver: BOND_BONDING.")
+                }
+                //case3: breaking a bond
+                if (mDevice?.bondState == BluetoothDevice.BOND_NONE) {
+                    Log.d("", "BroadcastReceiver: BOND_NONE.")
+                }
+            } else if (action == BluetoothDevice.ACTION_ACL_CONNECTED) {
+                Log.d("", "BroadcastReceiver: ACTION_ACL_CONNECTED.")
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,14 +74,32 @@ class CustomDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         getPairingDevices()
         recyclerView_custom_fragment.layoutManager = LinearLayoutManager(context)
-        var customFragmentAdapter = CustomFragmentAdapter(deviceItemList){
-            BluetoothHelper.connectDevice(it)
+        val customFragmentAdapter = CustomFragmentAdapter(deviceItemList) {
+            if (it.createBond()) {
+                // bleUtils.run(mDevice,getActivity());
+                val connector =
+                    BluetoothConnector(
+                        it,
+                        true,
+                        BluetoothHelper.bluetoothAdapter,
+                        null,
+                        nextViewListener
+                    )
+                try {
+                    connector.connect()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+            //    BleUtils().pairDevice(it)
+            //   BluetoothHelper.connectDevice(it)
         }
+        nextViewListener = this
         recyclerView_custom_fragment.adapter = customFragmentAdapter
 
 
-        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND);
-        getActivity()?.registerReceiver(bReciever, filter);
+        val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        context?.registerReceiver(bReciever, filter)
 
         BluetoothHelper.startScan {
             if (!checkDeviceInList(it)) {
@@ -46,6 +107,12 @@ class CustomDialogFragment : DialogFragment() {
                 customFragmentAdapter.notifyItemInserted(deviceItemList.size - 1)
             }
         }
+
+        //Broadcasts when bond state changes (ie:pairing)
+        val filter1 = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+        /* filter1.addAction()
+         filter1.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)*/
+        context?.registerReceiver(pairedBluetoothReceiver, filter1)
 
         setupClickListeners(view)
     }
@@ -66,24 +133,35 @@ class CustomDialogFragment : DialogFragment() {
         super.onDestroy()
         BluetoothHelper.cancelSacn()
 //        activity?.unregisterReceiver(bReciever)
+        context?.unregisterReceiver(pairedBluetoothReceiver)
     }
 
-    fun setupClickListeners(view: View) {
+    private fun setupClickListeners(view: View) {
         view.btn_cancel.setOnClickListener {
             BluetoothHelper.cancelSacn()
-            activity?.unregisterReceiver(bReciever)
+            context?.unregisterReceiver(bReciever)
             dismiss()
         }
 
     }
 
 
-    fun getPairingDevices() {
+    private fun getPairingDevices() {
         val pairedDevices: Array<BluetoothDevice> = BluetoothHelper.getPairedDevice()
-        if (pairedDevices.size > 0) {
+        if (pairedDevices.isNotEmpty()) {
             for (device in pairedDevices) {
                 deviceItemList.add(device)
             }
         }
     }
+
+    override fun moveToNextFragment(device: BluetoothDevice?) {
+        Toast.makeText(context, "Connected          " + device?.address, Toast.LENGTH_LONG).show()
+    }
+
+    override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
+        Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show()
+    }
+
+
 }

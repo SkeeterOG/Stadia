@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sachtech.stadia">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -23,7 +24,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".HomeActivity"></activity>
+        <activity android:name=".HomeActivity">
+            <intent-filter>
+                <action android:name="BluetoothDevice.ACTION_BOND_STATE_CHANGED" />
+                <action android:name="BluetoothDevice.ACTION_ACL_CONNECTED" />
+                <action android:name="BluetoothDevice.ACTION_ACL_DISCONNECTED" />
+            </intent-filter>
+        </activity>
         <activity android:name=".DescriptionActivity"></activity>
         <activity android:name=".SetUpStadiaActivity"></activity>
         <activity android:name=".SettingsActivity"></activity>
