@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sachtech.stadia.BluetoothHelper.bReciever
+import com.sachtech.stadia.utils.BleUtils
 import com.sachtech.stadia.utils.BluetoothConnector
 import kotlinx.android.synthetic.main.custom_fragment.*
 import kotlinx.android.synthetic.main.custom_fragment.view.*
@@ -75,8 +76,7 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
         getPairingDevices()
         recyclerView_custom_fragment.layoutManager = LinearLayoutManager(context)
         val customFragmentAdapter = CustomFragmentAdapter(deviceItemList) {
-            if (it.createBond()) {
-                // bleUtils.run(mDevice,getActivity());
+            if (it.bondState == 12) {
                 val connector =
                     BluetoothConnector(
                         it,
@@ -90,9 +90,24 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
+            } else {
+                BleUtils().unPairDevice(it)
+                if (it.createBond()) {
+                    val connector =
+                        BluetoothConnector(
+                            it,
+                            true,
+                            BluetoothHelper.bluetoothAdapter,
+                            null,
+                            nextViewListener
+                        )
+                    try {
+                        connector.connect()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
             }
-            //    BleUtils().pairDevice(it)
-            //   BluetoothHelper.connectDevice(it)
         }
         nextViewListener = this
         recyclerView_custom_fragment.adapter = customFragmentAdapter
