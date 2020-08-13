@@ -20,4 +20,5 @@
     <string name="height_ft">Height ft</string>
     <string name="setup_stadia">SETUP STADIA</string>
     <string name="not_connected">Not Connected</string>
+    <string name="bluetooth_devices">Bluetooth Devices</string>
 </resources>
