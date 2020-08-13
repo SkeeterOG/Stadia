@@ -28,11 +28,12 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
         start_scan.setOnClickListener(this)
 
         fragmentManager = supportFragmentManager
+        setupConnection()
     }
 
     override fun onResume() {
         super.onResume()
-        setupConnection()
+        // setupConnection()
     }
 
 
@@ -53,10 +54,10 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
                         this
                     )
                 ) {
-                    if (customDialogFragment == null) {
-                        customDialogFragment = CustomDialogFragment()
-                        fragmentManager?.let { customDialogFragment?.show(it, "dilaog") }
-                    }
+
+                    customDialogFragment = CustomDialogFragment()
+                    fragmentManager?.let { customDialogFragment?.show(it, "dilaog") }
+
                 } else {
                     val intent =
                         Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)

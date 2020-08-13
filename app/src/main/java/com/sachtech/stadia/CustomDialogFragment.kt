@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sachtech.stadia.BluetoothHelper.bReciever
 import com.sachtech.stadia.utils.BleUtils
 import com.sachtech.stadia.utils.BluetoothConnector
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.custom_fragment.*
 import kotlinx.android.synthetic.main.custom_fragment.view.*
 import java.io.IOException
