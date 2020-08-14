@@ -27,6 +27,7 @@ class CustomFragmentAdapter(
         val item = deviceItemList[position]
         holder.itemView.tv_name.text = item.name
         holder.itemView.tv_address.text = item.address
+
         holder.itemView.setOnClickListener {
             onItemClick(deviceItemList[position])
         }

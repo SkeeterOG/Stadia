@@ -77,6 +77,7 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
         getPairingDevices()
         recyclerView_custom_fragment.layoutManager = LinearLayoutManager(context)
         val customFragmentAdapter = CustomFragmentAdapter(deviceItemList) {
+
             if (it.bondState == 12) {
                 val connector =
                     BluetoothConnector(
@@ -172,7 +173,9 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
     }
 
     override fun moveToNextFragment(device: BluetoothDevice?) {
-        Toast.makeText(context, "Connected          " + device?.address, Toast.LENGTH_LONG).show()
+
+        Toast.makeText(context, "Connected       " + device?.address, Toast.LENGTH_LONG).show()
+
     }
 
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
