@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -55,7 +56,17 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
                     )
                 ) {
 
-                    customDialogFragment = CustomDialogFragment()
+                    customDialogFragment = CustomDialogFragment(){
+                        if(it) {
+                            tv_notconnected.setText("Connected")
+                            tv_notconnected.setTextColor(Color.GREEN)
+                        }
+                        else{
+                            tv_notconnected.setText("Disconnected")
+                            tv_notconnected.setTextColor(Color.RED)
+
+                        }
+                    }
                     fragmentManager?.let { customDialogFragment?.show(it, "dilaog") }
 
                 } else {

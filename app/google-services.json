@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "913608517625",
+    "firebase_url": "https://stadia-b05a0.firebaseio.com",
+    "project_id": "stadia-b05a0",
+    "storage_bucket": "stadia-b05a0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913608517625:android:6d8177ff93dbc06f197f28",
+        "android_client_info": {
+          "package_name": "com.sachtech.stadia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "913608517625-09gn42t5e6t9lsmkbgj9ks7edlidkphb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD974RwFYlgm-le4r15nE2hrda8A0hiH8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "913608517625-09gn42t5e6t9lsmkbgj9ks7edlidkphb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

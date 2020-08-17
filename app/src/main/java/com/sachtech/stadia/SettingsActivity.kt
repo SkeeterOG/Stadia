@@ -10,17 +10,15 @@ import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_settings.*
 
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
-    var sharedPreference: SharedPreferences? = null
 
-    var mp: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        sharedPreference = getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
-        var editor = sharedPreference?.edit()
+        BaseActivity().sharedPreference = getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
+        var editor = BaseActivity().sharedPreference?.edit()
 
 
         checkBox_VisualAlert.setOnCheckedChangeListener { compoundButton, isChecked ->
@@ -31,11 +29,6 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 editor?.putBoolean(PrefKey.VisualAlert, false)
                 editor?.apply()
-                mp?.isLooping = false
-                mp?.stop()
-                mp?.release();
-                mp = null;
-
             }
         }
 
@@ -46,10 +39,6 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 editor?.putBoolean(PrefKey.SoundAlert, false)
                 editor?.apply()
-                mp?.isLooping = false
-                mp?.stop()
-                mp?.release();
-                mp = null;
             }
         }
 
@@ -60,10 +49,7 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 editor?.putBoolean(PrefKey.VoiceAlert, false)
                 editor?.apply()
-                mp?.isLooping = false
-                mp?.stop()
-                mp?.release();
-                mp = null;
+
             }
         }
 
@@ -73,6 +59,9 @@ class SettingsActivity : AppCompatActivity() {
                 fromUser: Boolean
             ) {
                 seekbar_Value.setText(" " + progress.toString())
+
+                editor?.putString(PrefKey.seekbarValue,progress.toString())
+                editor?.apply()
                 //Toast.makeText(applicationContext, "seekbar progress: $progress", Toast.LENGTH_SHORT).show()
             }
 
@@ -87,21 +76,22 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         btn_play.setOnClickListener {
-            if (sharedPreference!!.getBoolean(PrefKey.VisualAlert, false) == true) {
-                mp = MediaPlayer.create(this, R.raw.beep2)
-                mp?.isLooping = true
-                mp?.start();
+
+
+           /* mp = MediaPlayer.create(this, R.raw.beep2)
+            mp?.start();*/
+
+          /*  if (sharedPreference!!.getBoolean(PrefKey.VisualAlert, false) == true) {
+
             }
             if (sharedPreference!!.getBoolean(PrefKey.VoiceAlert, false) == true) {
                 mp = MediaPlayer.create(this, R.raw.beep)
-                mp?.isLooping = true
                 mp?.start();
             }
             if (sharedPreference!!.getBoolean(PrefKey.SoundAlert, false) == true) {
                 mp = MediaPlayer.create(this, R.raw.beep2)
-                mp?.isLooping = true
                 mp?.start();
-            }
+            }*/
         }
 
     }

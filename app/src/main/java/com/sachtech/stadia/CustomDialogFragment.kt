@@ -16,12 +16,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.sachtech.stadia.BluetoothHelper.bReciever
 import com.sachtech.stadia.utils.BleUtils
 import com.sachtech.stadia.utils.BluetoothConnector
-import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.custom_fragment.*
 import kotlinx.android.synthetic.main.custom_fragment.view.*
 import java.io.IOException
 
-class CustomDialogFragment : DialogFragment(), NextViewListener {
+class CustomDialogFragment(val onDeviceListenr:(Boolean)->Unit) : DialogFragment(), NextViewListener {
     var deviceItemList = ArrayList<BluetoothDevice>()
     private var nextViewListener: NextViewListener? = null
 
@@ -42,7 +41,7 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
                     val connector =
                         BluetoothConnector(
                             mDevice, true,
-                            BluetoothHelper.bluetoothAdapter, null, nextViewListener
+                            BluetoothHelper.bluetoothAdapter, null, nextViewListener,context
                         )
                     try {
                         connector.connect()
@@ -85,7 +84,7 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
                         true,
                         BluetoothHelper.bluetoothAdapter,
                         null,
-                        nextViewListener
+                        nextViewListener,context
                     )
                 try {
                     connector.connect()
@@ -101,7 +100,7 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
                             true,
                             BluetoothHelper.bluetoothAdapter,
                             null,
-                            nextViewListener
+                            nextViewListener,context
                         )
                     try {
                         connector.connect()
@@ -174,12 +173,13 @@ class CustomDialogFragment : DialogFragment(), NextViewListener {
 
     override fun moveToNextFragment(device: BluetoothDevice?) {
 
-        Toast.makeText(context, "Connected       " + device?.address, Toast.LENGTH_LONG).show()
+        onDeviceListenr(true)
+
 
     }
 
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
-        Toast.makeText(context, "Failed", Toast.LENGTH_LONG).show()
+       onDeviceListenr(false)
     }
 
 

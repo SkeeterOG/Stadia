@@ -4,6 +4,7 @@ object PrefKey {
     var VisualAlert:String="VisualAlert"
     var SoundAlert:String="SoundAlert"
     var VoiceAlert:String="VoiceAlert"
+    var seekbarValue:String="SeekbarValue"
 
 
 }
