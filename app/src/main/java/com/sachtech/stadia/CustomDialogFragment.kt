@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sachtech.stadia.BluetoothHelper.bReciever
@@ -20,9 +19,8 @@ import kotlinx.android.synthetic.main.custom_fragment.*
 import kotlinx.android.synthetic.main.custom_fragment.view.*
 import java.io.IOException
 
-class CustomDialogFragment(val onDeviceListenr:(Boolean)->Unit) : DialogFragment(), NextViewListener {
+class CustomDialogFragment(val onDeviceListenr:(BluetoothDevice?)->Unit) : DialogFragment() {
     var deviceItemList = ArrayList<BluetoothDevice>()
-    private var nextViewListener: NextViewListener? = null
 
     /**
      * Broadcast Receiver that detects bond state changes (Pairing status changes)
@@ -38,16 +36,7 @@ class CustomDialogFragment(val onDeviceListenr:(Boolean)->Unit) : DialogFragment
                 if (mDevice?.bondState == BluetoothDevice.BOND_BONDED) {
                     Log.d("", "BroadcastReceiver: BOND_BONDED.")
                     // bleUtils.run(mDevice,getActivity());
-                    val connector =
-                        BluetoothConnector(
-                            mDevice, true,
-                            BluetoothHelper.bluetoothAdapter, null, nextViewListener,context
-                        )
-                    try {
-                        connector.connect()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
+                    onDeviceListenr(mDevice)
                 }
                 //case2: creating a bone
                 if (mDevice?.bondState == BluetoothDevice.BOND_BONDING) {
@@ -78,39 +67,17 @@ class CustomDialogFragment(val onDeviceListenr:(Boolean)->Unit) : DialogFragment
         val customFragmentAdapter = CustomFragmentAdapter(deviceItemList) {
 
             if (it.bondState == 12) {
-                val connector =
-                    BluetoothConnector(
-                        it,
-                        true,
-                        BluetoothHelper.bluetoothAdapter,
-                        null,
-                        nextViewListener,context
-                    )
-                try {
-                    connector.connect()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+
+               onDeviceListenr(it)
             } else {
                 BleUtils().unPairDevice(it)
                 if (it.createBond()) {
-                    val connector =
-                        BluetoothConnector(
-                            it,
-                            true,
-                            BluetoothHelper.bluetoothAdapter,
-                            null,
-                            nextViewListener,context
-                        )
-                    try {
-                        connector.connect()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
+                    onDeviceListenr(it)
+
                 }
             }
         }
-        nextViewListener = this
+
         recyclerView_custom_fragment.adapter = customFragmentAdapter
 
 
@@ -171,16 +138,7 @@ class CustomDialogFragment(val onDeviceListenr:(Boolean)->Unit) : DialogFragment
         }
     }
 
-    override fun moveToNextFragment(device: BluetoothDevice?) {
 
-        onDeviceListenr(true)
-
-
-    }
-
-    override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
-       onDeviceListenr(false)
-    }
 
 
 }

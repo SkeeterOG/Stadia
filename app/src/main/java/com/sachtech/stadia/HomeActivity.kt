@@ -12,10 +12,11 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentManager
+import com.sachtech.stadia.base.BaseInteractionListener
 import com.sachtech.stadia.utils.openA
 import kotlinx.android.synthetic.main.activity_home.*
 
-class HomeActivity : AppCompatActivity(), View.OnClickListener {
+class HomeActivity : BaseActivity(), View.OnClickListener, BaseInteractionListener {
 
     private val REQUEST_ACCESS_COARSE_LOCATION = 1022 // random number
 
@@ -38,6 +39,31 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
         // setupConnection()
     }
 
+    override fun onHeightAlert() {
+
+    }
+
+    override fun onReceivedData(height: String, battery: String) {
+
+
+    }
+
+    override fun onConnect() {
+        if (customDialogFragment != null) {
+            if (customDialogFragment!!.dialog?.isShowing == true) {
+                customDialogFragment?.dismiss()
+            }
+        }
+
+        tv_notconnected.setText("Connected")
+        tv_notconnected.setTextColor(Color.GREEN)
+    }
+
+    override fun onDisconnect() {
+        tv_notconnected.setText("Disconnected")
+        tv_notconnected.setTextColor(Color.RED)
+    }
+
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
@@ -56,15 +82,9 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
                     )
                 ) {
 
-                    customDialogFragment = CustomDialogFragment(){
-                        if(it) {
-                            tv_notconnected.setText("Connected")
-                            tv_notconnected.setTextColor(Color.GREEN)
-                        }
-                        else{
-                            tv_notconnected.setText("Disconnected")
-                            tv_notconnected.setTextColor(Color.RED)
-
+                    customDialogFragment = CustomDialogFragment() {
+                        it?.let {
+                            connectBt(it)
                         }
                     }
                     fragmentManager?.let { customDialogFragment?.show(it, "dilaog") }
@@ -109,5 +129,12 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    override fun connectBt(device: BluetoothDevice) {
+        onConnectBt(device)
+    }
+
+    override fun writeDat(data: String) {
+        writeData(data)
+    }
 
 }

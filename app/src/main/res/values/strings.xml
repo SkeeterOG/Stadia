@@ -21,4 +21,6 @@
     <string name="setup_stadia">SETUP STADIA</string>
     <string name="not_connected">Not Connected</string>
     <string name="bluetooth_devices">Bluetooth Devices</string>
+    <string name="currentoffset_in_inches">Current Offset In Inches</string>
+    <string name="inches">Inches</string>
 </resources>

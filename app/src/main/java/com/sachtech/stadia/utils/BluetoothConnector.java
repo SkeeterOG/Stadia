@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelUuid;
@@ -14,12 +13,10 @@ import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.sachtech.stadia.BaseActivity;
-import com.sachtech.stadia.NextViewListener;
+import com.sachtech.stadia.BluetoothConnectionListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,10 +26,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class BluetoothConnector {
-    public static final  String bluetooth_receiver = "BLUETOOTH_RECEIVER";
 
+    public static final String bluetooth_receiver = "BLUETOOTH_RECEIVER";
     private Context context;
-    private BluetoothSocketWrapper bluetoothSocket;
+    // private BluetoothSocketWrapper bluetoothSocket;
     private BluetoothSocket mBluetoothSocket;
     private BluetoothDevice device;
     private boolean secure;
@@ -40,24 +37,22 @@ public class BluetoothConnector {
     private List<UUID> uuidCandidates;
     private int candidate;
     ParcelUuid[] uuids;
-    private NextViewListener viewListener;
+    private BluetoothConnectionListener viewListener;
 
 
-    /**
-     * @param device         the device
-     * @param secure         if connection should be done via a secure socket
-     * @param adapter        the Android BT adapter
-     * @param uuidCandidates a list of UUIDs. if null or empty, the Serial PP id is used
-     */
-    public BluetoothConnector(BluetoothDevice device, boolean secure, BluetoothAdapter adapter,
-                              List<UUID> uuidCandidates, NextViewListener viewListener, Context context) {
-        this.viewListener = viewListener;
-        this.device = device;
+    static BluetoothConnector bluetoothConnector;
+
+    public static BluetoothConnector getInstance(Context context, BluetoothConnectionListener viewListener) {
+        if (bluetoothConnector == null)
+            bluetoothConnector = new BluetoothConnector(context, viewListener);
+        return bluetoothConnector;
+    }
+
+    private BluetoothConnector(Context context, BluetoothConnectionListener viewListener) {
         this.context = context;
-        this.secure = secure;
-        this.adapter = adapter;
-        this.uuidCandidates = uuidCandidates;
-        uuids = device.getUuids();
+        this.viewListener = viewListener;
+
+        // uuids = device.getUuids();
 
         if (this.uuidCandidates == null || this.uuidCandidates.isEmpty()) {
             this.uuidCandidates = new ArrayList<>();
@@ -69,74 +64,39 @@ public class BluetoothConnector {
     int numBytes;
     ConnectedThread connectedThread;
     private Handler handler; // handler that gets info from Bluetooth service
-    InputThread inputThread = new InputThread();
+    InputThread inputThread;
 
-    public BluetoothSocketWrapper connect() throws IOException {
+    public BluetoothSocket connect(BluetoothDevice device) throws IOException {
+        this.device = device;
+        uuids = device.getUuids();
         boolean success = false;
-        if (selectSocket()) {
-            adapter.cancelDiscovery();
-            try {
-                // bluetoothSocket.connect();
-                if (adapter.isEnabled()) {
-                    if (uuids != null) {
-                        mBluetoothSocket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
-                        mBluetoothSocket.connect();
-                        mHandler1.sendEmptyMessage(0);
-                    }
-                }
-                success = true;
-                viewListener.moveToNextFragment(device);
-            } catch (IOException e) {
-                //try the fallback
-                try {
-                    bluetoothSocket = new FallbackBluetoothSocket(bluetoothSocket.getUnderlyingSocket());
-                    Thread.sleep(500);
-                    bluetoothSocket.connect();
-
-
-
-                    inputThread = new InputThread();
-                    inputThread.start();
-                    inputThread.receiveData(bluetoothSocket);
-
-                    OutputThread outputThread = new OutputThread();
-                    outputThread.start();
-                    outputThread.sendData(bluetoothSocket, "0".getBytes());
-
-                   /* mmBuffer = new byte[1024];
-                    while (true) {
-                        try {
-                            numBytes = bluetoothSocket.getInputStream().read(mmBuffer);
-                            Message readMsg = handler.obtainMessage(
-                                    0, numBytes, -1,
-                                    mmBuffer);
-                            readMsg.sendToTarget();
-                        } catch (IOException ex) {
-                            Log.d(" ", "Input stream was disconnected", ex);
-                            break;
-                        }
-                    }*/
-
-
-                    success = true;
-                    viewListener.moveToNextFragment(device);
-                } catch (FallbackException e1) {
-                    Log.w("BT", "Could not initialize FallbackBluetoothSocket classes.", e);
-                    viewListener.bluetoothPairError(e1, device);
-                } catch (InterruptedException e1) {
-                    Log.w("BT", e1.getMessage(), e1);
-                    viewListener.bluetoothPairError(e1, device);
-                } catch (IOException e1) {
-                    Log.w("BT", "Fallback failed. Cancelling.", e1);
-                    viewListener.bluetoothPairError(e1, device);
-                }
+        //if (selectSocket()) {
+        // adapter.cancelDiscovery();
+        try {
+            //bluetoothSocket.connect();
+            // if (adapter.isEnabled()) {
+            if (uuids != null) {
+                mBluetoothSocket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
+                mBluetoothSocket.connect();
+                mHandler1.sendEmptyMessage(0);
+                inputThread = new InputThread(mBluetoothSocket);
+                inputThread.start();
+                Thread.sleep(150);
+                sendData("0");
             }
+
+            // }
+            success = true;
+            viewListener.onDeviceConnect(device);
+        } catch (Exception e) {
+            mBluetoothSocket = null;
+            viewListener.onDIsconnect(e.getLocalizedMessage());
         }
 /*
         if (!success) {
             throw new IOException("Could not connect to device: "+ device.getAddress());
         }*/
-        return bluetoothSocket;
+        return mBluetoothSocket;
     }
 
     private boolean selectSocket() throws IOException {
@@ -155,9 +115,20 @@ public class BluetoothConnector {
             } else {
                 tmp = device.createInsecureRfcommSocketToServiceRecord(uuids[0].getUuid());
             }
-            bluetoothSocket = new NativeBluetoothSocket(tmp);
+            //   bluetoothSocket = new NativeBluetoothSocket(tmp);
         }
         return true;
+    }
+
+    public void sendData(@NotNull String data) {
+        OutputThread outputThread = new OutputThread();
+        outputThread.start();
+        try {
+            outputThread.sendData(mBluetoothSocket, data.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("send data ex>> ", e.getLocalizedMessage() + "");
+        }
     }
 
     public interface BluetoothSocketWrapper {
@@ -219,6 +190,7 @@ public class BluetoothConnector {
 
         @Override
         public BluetoothSocket getUnderlyingSocket() {
+
             return socket;
         }
 
@@ -280,45 +252,76 @@ public class BluetoothConnector {
     }
 
     class InputThread extends Thread {
-        public void receiveData(BluetoothSocketWrapper socket) throws IOException {
-            InputStream socketInputStream = socket.getInputStream();
-            byte[] buffer = new byte[256];
-            int bytes;
+        BluetoothSocket socket;
 
-            // Keep looping to listen for received messages
-            while (true) {
-                try {
+        public InputThread(BluetoothSocket bluetoothSocket) {
+            this.socket = bluetoothSocket;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+
+            try {
+                receiveData();
+            } catch (IOException e) {
+                e.printStackTrace();
+                viewListener.onDIsconnect(e.getLocalizedMessage());
+                Log.e("Reading ex>> ", e.getLocalizedMessage() + "");
+            }
+        }
+
+        private void receiveData() throws IOException {
+            if (socket != null) {
+                InputStream socketInputStream = socket.getInputStream();
+                byte[] buffer = new byte[1024];
+                int bytes;
+
+                // Keep looping to listen for received messages
+
+                while (true) {
                     bytes = socketInputStream.read(buffer);
                     //read bytes from input buffer
-                    String readMessage = new String(buffer, 0, bytes);
-                    if (readMessage.contains("|")) {
-                        String[] arrayString = readMessage.split("|");
-                        String distance = arrayString[0];
-                        String battery = arrayString[1];
+                    if (bytes != -1) {
+                        String readMessage = new String(buffer, 0, bytes);
+                        if (readMessage.contains("|")) {
+                            String[] arrayString = readMessage.split("|");
+                            String distance = arrayString[0];
+                            String battery = arrayString[1];
 
-                        Intent intent = new Intent(bluetooth_receiver);
-                        intent.putExtra("distance", distance);
-                        intent.putExtra("battery", battery);
-                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                            Intent intent = new Intent(bluetooth_receiver);
+                            intent.putExtra("distance", distance);
+                            intent.putExtra("battery", battery);
+                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
+                        }
+                        Log.e("Reading >> ", readMessage + "");
                     }
                     // Send the obtained bytes to the UI Activity via handler
-                    Log.i("logging", readMessage + "");
-                } catch (IOException e) {
-                    break;
+                    Log.e("Reading >> ", "no data");
                 }
-            }
 
+
+            } else {
+
+                viewListener.onDIsconnect("socket null");
+
+
+            }
         }
     }
 
     class OutputThread extends Thread {
 
-        public void sendData(BluetoothSocketWrapper socket, byte[] data) throws IOException {
-
-            OutputStream outputStream = socket.getOutputStream();
-            if (outputStream != null)
-                outputStream.write(data);
+        public void sendData(BluetoothSocket socket, byte[] data) throws IOException {
+            if (socket != null) {
+                OutputStream outputStream = socket.getOutputStream();
+                if (outputStream != null)
+                    outputStream.write(data);
+                outputStream.flush();
+            } else {
+                viewListener.onDIsconnect("socket null");
+            }
 
         }
     }

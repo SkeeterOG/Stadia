@@ -23,7 +23,6 @@ import java.util.*
 
 object BluetoothHelper {
     val bluetoothAdapter: BluetoothAdapter by lazy { BluetoothAdapter.getDefaultAdapter() }
-    private val connectThread by lazy { ConnectThread() }
     var onDeviceScan: ((BluetoothDevice) -> Unit)? = null
     private const val PREFS_LOCATION_NOT_REQUIRED = "location_not_required"
     private const val PREFS_PERMISSION_REQUESTED = "permission_requested"
@@ -166,10 +165,7 @@ object BluetoothHelper {
         bluetoothAdapter.cancelDiscovery()
     }
 
-    fun connectDevice(bluetoothDevice: BluetoothDevice) {
-        connectThread.start()
-        connectThread.connect(bluetoothDevice, UUID.randomUUID())
-    }
+
 
 
     val bReciever: BroadcastReceiver = object : BroadcastReceiver() {
@@ -186,42 +182,5 @@ object BluetoothHelper {
     }
 
 
-    class ConnectThread : Thread() {
-        private val bTSocket: BluetoothSocket? = null
-
-
-        fun connect(bTDevice: BluetoothDevice, mUUID: UUID?): Boolean {
-            var bTSocket: BluetoothSocket? = null
-            bTSocket = try {
-                bTDevice.createRfcommSocketToServiceRecord(mUUID)
-            } catch (e: IOException) {
-                Log.e("CONNECTTHREAD", "Could not create RFCOMM socket:" + e.toString())
-                return false
-            }
-
-            try {
-                bTSocket!!.connect()
-            } catch (e: IOException) {
-                Log.e("CONNECTTHREAD", "Could not connect: " + e.toString())
-                try {
-                    bTSocket!!.close()
-                } catch (close: IOException) {
-                    Log.e("CONNECTTHREAD", "Could not close connection:" + e.toString())
-                    return false
-                }
-            }
-            return true
-        }
-
-        fun cancel(): Boolean {
-            try {
-                bTSocket!!.close()
-            } catch (e: IOException) {
-                Log.e("CONNECTTHREAD", "Could not close connection:" + e.toString())
-                return false
-            }
-            return true
-        }
-    }
 
 }
