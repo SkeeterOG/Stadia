@@ -30,7 +30,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         val filter1 = IntentFilter()
         filter1.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter1.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-        registerReceiver(pairedBluetoothReceiver,filter1)
+        registerReceiver(pairedBluetoothReceiver, filter1)
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadCastReceiver, IntentFilter("receive broadcast"))
 
@@ -107,6 +107,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
     fun writeData(data: String) {
         bluetoothConnector.sendData(data)
+
     }
 
     override fun onDeviceConnect(device: BluetoothDevice?) {
@@ -117,6 +118,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
         onDisconnect()
     }
+
     private val pairedBluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -128,7 +130,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                 if (mDevice?.bondState == BluetoothDevice.BOND_BONDED) {
                     Log.d("", "BroadcastReceiver: BOND_BONDED.")
                     // bleUtils.run(mDevice,getActivity());
-                      onConnectBt(mDevice)
+                    onConnectBt(mDevice)
                 }
                 //case2: creating a bone
                 if (mDevice?.bondState == BluetoothDevice.BOND_BONDING) {
@@ -139,7 +141,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                     Log.d("", "BroadcastReceiver: BOND_NONE.")
                     onDisconnect()
                 }
-            }  else if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+            } else if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                 val state = intent.getIntExtra(
                     BluetoothAdapter.EXTRA_STATE,
                     BluetoothAdapter.ERROR
@@ -151,8 +153,9 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
             }
         }
     }
+
     override fun onDIsconnect(error: String) {
-onDisconnect()
+        onDisconnect()
 
     }
 

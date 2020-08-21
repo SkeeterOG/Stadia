@@ -38,6 +38,7 @@ public class BluetoothConnector {
     private int candidate;
     ParcelUuid[] uuids;
     private BluetoothConnectionListener viewListener;
+    int bytes;
 
 
     static BluetoothConnector bluetoothConnector;
@@ -64,7 +65,7 @@ public class BluetoothConnector {
     int numBytes;
     ConnectedThread connectedThread;
     private Handler handler; // handler that gets info from Bluetooth service
-    InputThread inputThread;
+    //InputThread inputThread;
 
     public BluetoothSocket connect(BluetoothDevice device) throws IOException {
         this.device = device;
@@ -78,9 +79,11 @@ public class BluetoothConnector {
             if (uuids != null) {
                 mBluetoothSocket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
                 mBluetoothSocket.connect();
-                mHandler1.sendEmptyMessage(0);
-                inputThread = new InputThread(mBluetoothSocket);
-                inputThread.start();
+              //  mHandler1.sendEmptyMessage(0);
+                receiveData(mBluetoothSocket);
+               /* inputThread = new InputThread(mBluetoothSocket);
+
+                inputThread.start();*/
                 Thread.sleep(150);
                 sendData("0");
             }
@@ -97,6 +100,23 @@ public class BluetoothConnector {
             throw new IOException("Could not connect to device: "+ device.getAddress());
         }*/
         return mBluetoothSocket;
+    }
+    public void receiveData(BluetoothSocket socket) throws IOException{
+        InputStream socketInputStream =  socket.getInputStream();
+        byte[] buffer = new byte[256];
+
+        // Keep looping to listen for received messages
+        while (true) {
+            try {
+                bytes = socketInputStream.read(buffer);            //read bytes from input buffer
+                String readMessage = new String(buffer, 0, bytes);
+                // Send the obtained bytes to the UI Activity via handler
+                Log.i("logging", readMessage + "");
+            } catch (IOException e) {
+                break;
+            }
+        }
+
     }
 
     private boolean selectSocket() throws IOException {
@@ -251,7 +271,7 @@ public class BluetoothConnector {
 
     }
 
-    class InputThread extends Thread {
+  /*  class InputThread extends Thread {
         BluetoothSocket socket;
 
         public InputThread(BluetoothSocket bluetoothSocket) {
@@ -277,29 +297,40 @@ public class BluetoothConnector {
                 byte[] buffer = new byte[1024];
                 int bytes;
 
+
                 // Keep looping to listen for received messages
 
                 while (true) {
-                    bytes = socketInputStream.read(buffer);
-                    //read bytes from input buffer
-                    if (bytes != -1) {
-                        String readMessage = new String(buffer, 0, bytes);
-                        if (readMessage.contains("|")) {
-                            String[] arrayString = readMessage.split("|");
-                            String distance = arrayString[0];
-                            String battery = arrayString[1];
 
-                            Intent intent = new Intent(bluetooth_receiver);
-                            intent.putExtra("distance", distance);
-                            intent.putExtra("battery", battery);
-                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        bytes = socketInputStream.read(buffer);
 
+                       if (bytes != -1) {
+                            String readMessage = new String(buffer, 0, bytes);
+                            if (readMessage.contains("|")) {
+                                String[] arrayString = readMessage.split("|");
+                                String distance = arrayString[0];
+                                String battery = arrayString[1];
+
+                                Intent intent = new Intent(bluetooth_receiver);
+                                intent.putExtra("distance", distance);
+                                intent.putExtra("battery", battery);
+                                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+                            }
+                            Log.e("Reading >> ", readMessage + "");
                         }
-                        Log.e("Reading >> ", readMessage + "");
-                    }
+                       else{
+                           Log.e("Reading >> ",  "");
+
+                       }
+
+
+
+                    //read bytes from input buffer
+
                     // Send the obtained bytes to the UI Activity via handler
                     Log.e("Reading >> ", "no data");
-                }
+               }
 
 
             } else {
@@ -309,7 +340,7 @@ public class BluetoothConnector {
 
             }
         }
-    }
+    }*/
 
     class OutputThread extends Thread {
 
