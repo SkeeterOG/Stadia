@@ -3,26 +3,29 @@ package com.sachtech.stadia
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.*
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.BluetoothConnector
 import com.sachtech.stadia.utils.PrefKey
 
 abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
-    var sharedPreference: SharedPreferences? = null
-    var mpVoice: MediaPlayer? = null
-    var mpSound: MediaPlayer? = null
+    val sharedPreference: SharedPreferences by lazy {
+        getSharedPreferences(
+            "PREFERENCE_NAME",
+            Context.MODE_PRIVATE
+        )
+    }
+    val audioPlayerManager by lazy { AudioPlayerManager(this) }
     val bluetoothConnector by lazy { BluetoothConnector.getInstance(this, this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPreference = getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE)
-        var editor = sharedPreference?.edit()
 
     }
+    var lastCommand=""
 
     override fun onResume() {
 
@@ -30,7 +33,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         val filter1 = IntentFilter()
         filter1.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter1.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
-        registerReceiver(pairedBluetoothReceiver,filter1)
+        registerReceiver(pairedBluetoothReceiver, filter1)
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadCastReceiver, IntentFilter("receive broadcast"))
 
@@ -59,14 +62,10 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                                 onHeightAlert()
                             }
                             if (sharedPreference!!.getBoolean(PrefKey.VoiceAlert, false) == true) {
-                                mpVoice = MediaPlayer.create(contxt, R.raw.beep)
-                                mpVoice?.isLooping = true
-                                mpVoice?.start();
+                                audioPlayerManager.startMediaPlayer(R.raw.beep)
                             }
                             if (sharedPreference!!.getBoolean(PrefKey.SoundAlert, false) == true) {
-                                mpSound = MediaPlayer.create(contxt, R.raw.beep2)
-                                mpSound?.isLooping = true
-                                mpSound?.start();
+                                audioPlayerManager.startMediaPlayer(R.raw.beep2)
                             }
 
 
@@ -100,7 +99,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
             .unregisterReceiver(broadCastReceiver)
     }
 
-    fun onConnectBt(device: BluetoothDevice) {
+    fun connectBt(device: BluetoothDevice) {
 
         bluetoothConnector.connect(device)
     }
@@ -117,6 +116,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
         onDisconnect()
     }
+
     private val pairedBluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -128,7 +128,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                 if (mDevice?.bondState == BluetoothDevice.BOND_BONDED) {
                     Log.d("", "BroadcastReceiver: BOND_BONDED.")
                     // bleUtils.run(mDevice,getActivity());
-                      onConnectBt(mDevice)
+                    connectBt(mDevice)
                 }
                 //case2: creating a bone
                 if (mDevice?.bondState == BluetoothDevice.BOND_BONDING) {
@@ -139,7 +139,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                     Log.d("", "BroadcastReceiver: BOND_NONE.")
                     onDisconnect()
                 }
-            }  else if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+            } else if (action == BluetoothAdapter.ACTION_STATE_CHANGED) {
                 val state = intent.getIntExtra(
                     BluetoothAdapter.EXTRA_STATE,
                     BluetoothAdapter.ERROR
@@ -151,10 +151,15 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
             }
         }
     }
+
     override fun onDIsconnect(error: String) {
-onDisconnect()
+        onDisconnect()
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        audioPlayerManager.releaseMediaPlayer()
+    }
 
 }

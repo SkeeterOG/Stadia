@@ -1,10 +1,11 @@
 package com.sachtech.stadia.utils
 
 object PrefKey {
-    var VisualAlert:String="VisualAlert"
-    var SoundAlert:String="SoundAlert"
-    var VoiceAlert:String="VoiceAlert"
-    var seekbarValue:String="SeekbarValue"
+    val VisualAlert:String="VisualAlert"
+    val SoundAlert:String="SoundAlert"
+    val VoiceAlert:String="VoiceAlert"
+    val seekbarValue:String="SeekbarValue"
+    val Height_Inches:String="Height_Inches"
 
 
 }

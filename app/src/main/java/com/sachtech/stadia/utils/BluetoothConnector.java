@@ -59,11 +59,6 @@ public class BluetoothConnector {
             this.uuidCandidates.add(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         }
     }
-
-    private byte[] mmBuffer; // mmBuffer store for the stream
-    int numBytes;
-    ConnectedThread connectedThread;
-    private Handler handler; // handler that gets info from Bluetooth service
     InputThread inputThread;
 
     public BluetoothSocket connect(BluetoothDevice device) throws IOException {

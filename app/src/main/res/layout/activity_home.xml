@@ -17,26 +17,6 @@
          app:layout_constraintStart_toStartOf="parent"
          app:layout_constraintTop_toTopOf="parent" />-->
 
-    <TextView
-        android:id="@+id/tv_notconnected"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_28sdp"
-        android:text="@string/not_connected"
-        android:textColor="#F80A0A"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:layout_width="@dimen/_20sdp"
-        android:layout_height="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_16sdp"
-        android:id="@+id/start_scan"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tv_notconnected"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_notconnected"
-        android:src="@drawable/bluetooth" />
 
     <ImageView
         android:id="@+id/iv_stadia_logo"
