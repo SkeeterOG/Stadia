@@ -72,9 +72,7 @@ class SettingsActivity : BaseActivity() {
         showSelectedValues()
     }
 
-    override fun onHeightAlert() {
 
-    }
 
     override fun onReceivedData(height: String, battery: String) {
 
@@ -101,17 +99,8 @@ class SettingsActivity : BaseActivity() {
 
 
 
-            seek_bar.setProgress(
-                sharedPreference.getInt(
-                    PrefKey.seekbarValue,
-                    0
-                )
-            )
-            seekbar_Value.setText(
-                 (sharedPreference.getInt(
-                    PrefKey.seekbarValue,
-                    0
-                )).toString()
+            seek_bar.setProgress(sharedPreference.getInt(PrefKey.seekbarValue, 0))
+            seekbar_Value.setText((sharedPreference.getInt(PrefKey.seekbarValue, 0)).toString()
             )
 
 

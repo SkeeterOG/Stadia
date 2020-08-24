@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelUuid;
@@ -40,31 +41,32 @@ public class BluetoothConnector {
     private BluetoothConnectionListener viewListener;
 
 
-    static BluetoothConnector bluetoothConnector;
+   private static BluetoothConnector bluetoothConnector;
 
-    public static BluetoothConnector getInstance(Context context, BluetoothConnectionListener viewListener) {
+    public static BluetoothConnector getInstance(Context context) {
         if (bluetoothConnector == null)
-            bluetoothConnector = new BluetoothConnector(context, viewListener);
+            bluetoothConnector = new BluetoothConnector(context);
         return bluetoothConnector;
     }
 
-    private BluetoothConnector(Context context, BluetoothConnectionListener viewListener) {
+    private BluetoothConnector(Context context) {
         this.context = context;
-        this.viewListener = viewListener;
 
-        // uuids = device.getUuids();
-
-        if (this.uuidCandidates == null || this.uuidCandidates.isEmpty()) {
-            this.uuidCandidates = new ArrayList<>();
-            this.uuidCandidates.add(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
-        }
     }
 
+    public void setBluetoothConnetionListener( BluetoothConnectionListener viewListener){
+        this.viewListener= viewListener;
+    }
     InputThread inputThread;
 
     public BluetoothSocket connect(BluetoothDevice device) throws IOException {
         this.device = device;
         uuids = device.getUuids();
+
+        if (this.uuidCandidates == null || this.uuidCandidates.isEmpty()) {
+            this.uuidCandidates = new ArrayList<>();
+            this.uuidCandidates.add(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
+        }
         boolean success = false;
         //if (selectSocket()) {
         // adapter.cancelDiscovery();
@@ -78,14 +80,14 @@ public class BluetoothConnector {
                 inputThread = new InputThread(mBluetoothSocket);
                 inputThread.start();
                 Thread.sleep(150);
-                sendData("0");
+                sendInfoCommand();
             }
 
             // }
             success = true;
             viewListener.onDeviceConnect(device);
         } catch (Exception e) {
-            mBluetoothSocket = null;
+            //mBluetoothSocket = null;
             viewListener.onDIsconnect(e.getLocalizedMessage());
         }
 /*
@@ -94,6 +96,19 @@ public class BluetoothConnector {
         }*/
         return mBluetoothSocket;
     }
+
+    private void sendInfoCommand() {
+        try {
+            Thread.sleep(200);
+            SharedPreferences sharedPreferences = context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE);
+            if(sharedPreferences!=null) {
+                sendData(sharedPreferences.getString(PrefKey.INSTANCE.getDATA_COMMAND(),"0"));
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+       }
 
     private boolean selectSocket() throws IOException {
         if (candidate >= uuidCandidates.size()) {
@@ -272,22 +287,23 @@ public class BluetoothConnector {
 
                     // Keep looping to listen for received messages
                     boolean isContinue = true;
-                    if(socketInputStream.available()>0) {
+                    //if(socketInputStream.available()>0) {
                         while (isContinue) {
                             try {
                                 bytes = socketInputStream.read(buffer);
                                 if (bytes != -1) {
                                     String readMessage = new String(buffer, 0, bytes);
+                                    //70|80  "",7,0,|,8.0
                                     if (readMessage.contains("|")) {
-                                        String[] arrayString = readMessage.split("|");
+                                        String[] arrayString = readMessage.replace("\r\n","").split("\\|");
                                         String distance = arrayString[0];
                                         String battery = arrayString[1];
 
                                         Intent intent = new Intent(bluetooth_receiver);
                                         intent.putExtra("distance", distance);
                                         intent.putExtra("battery", battery);
-                                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
+                                        context.sendBroadcast(intent);
+                                        sendInfoCommand();
                                     }
                                     Log.e("Reading >> ", readMessage + "");
                                 }
@@ -303,7 +319,7 @@ public class BluetoothConnector {
                             //read bytes from input buffer
 
                         }
-                    }
+                   // }
                 } catch (IOException e) {
                     e.printStackTrace();
                     if(e!=null)
