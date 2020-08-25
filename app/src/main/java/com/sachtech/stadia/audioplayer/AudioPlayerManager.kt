@@ -98,8 +98,8 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
         if (requestAudioFocus() == true) {
             mediaPlayer?.setAudioAttributes(getAudioAttributes())
 
-            //mediaPlayer?.start()
-            mediaPlayer?.prepareAsync()
+            mediaPlayer?.start()
+          //  mediaPlayer?.prepareAsync()
 
             mediaPlayer?.setOnCompletionListener {
                 releaseMediaPlayer()

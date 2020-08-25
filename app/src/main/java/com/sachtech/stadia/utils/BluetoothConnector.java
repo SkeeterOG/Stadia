@@ -308,7 +308,7 @@ public class BluetoothConnector {
                                     Log.e("Reading >> ", readMessage + "");
                                 }
                                 // Send the obtained bytes to the UI Activity via handler
-                                Log.e("Reading >> ", "no data");
+                               // Log.e("Reading >> ", "no data");
                             } catch (IOException e) {
                                 isContinue = false;
                                 if (e != null)

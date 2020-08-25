@@ -21,12 +21,12 @@ class DescriptionActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     override fun onReceivedData(height: String, battery: String) {
         if (height.isNotEmpty()) {
-            if (height.contains("StandBy", true)) {
+            if (height.contains("STANDBY", true)) {
                 tv_heightftvalue.text = "" + height
                 tv_warning.visibility = View.GONE
             } else {
                 val heightInt = height.toInt()
-                tv_heightftvalue.text = "" + (heightInt * 0.0328)
+                tv_heightftvalue.text = "" + (heightInt * 0.0328).toString().uptoTwoDecimal()
                 if (isHeightAllert(heightInt)) {
                     if (sharedPreference?.getBoolean(PrefKey.VisualAlert, false)) {
                         tv_warning.visibility = View.VISIBLE
@@ -39,6 +39,9 @@ class DescriptionActivity : BaseActivity(), View.OnClickListener {
 
         }
 
+    }
+    fun String.uptoTwoDecimal(): String {
+      return  String.format("%.2f", this.toDouble());
     }
 
 

@@ -43,8 +43,11 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun onDisconnect() {
-        tv_tapButton.text = getString(R.string.tap_button_to_connect_to_stadia_via_bluetooth)
-        tv_tapButton.setTextColor(Color.RED)
+        runOnUiThread {
+            tv_tapButton.text = getString(R.string.tap_button_to_connect_to_stadia_via_bluetooth)
+            tv_tapButton.setTextColor(Color.RED)
+        }
+
     }
 
     private fun setupConnection() {

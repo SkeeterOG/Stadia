@@ -50,10 +50,13 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                 when (intent?.action!!) {
                     BluetoothConnector.bluetooth_receiver -> {
                         onReceivedData(distance, battery)
-                        if (isHeightAllert(distance.toInt())) {
-                            playHeightAlert()
-                        } else {
-                            audioPlayerManager.stopMedaiPlayer()
+                        if(!distance.isEmpty()&& !distance.contains("STANDBY")) {
+
+                            if (isHeightAllert(distance.toInt())) {
+                                playHeightAlert()
+                            } else {
+                                audioPlayerManager.stopMedaiPlayer()
+                            }
                         }
                     }
 
@@ -70,7 +73,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
      fun isHeightAllert(heightInt: Int): Boolean {
 
         val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.0328
-        return i >=sharedPreference.getInt(PrefKey.seekbarValue,0)
+        return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
 
     }
 
@@ -90,7 +93,10 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     }
 
     override fun onDeviceConnect(device: BluetoothDevice?) {
-        onConnect()
+        runOnUiThread {
+            onConnect()
+        }
+
 
     }
 
