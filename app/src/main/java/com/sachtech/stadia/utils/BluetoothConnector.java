@@ -59,6 +59,7 @@ public class BluetoothConnector {
             this.uuidCandidates.add(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         }
     }
+
     InputThread inputThread;
 
     public BluetoothSocket connect(BluetoothDevice device) throws IOException {
@@ -257,43 +258,58 @@ public class BluetoothConnector {
         public void run() {
             super.run();
 
-            try {
-                receiveData();
-            } catch (IOException e) {
-                e.printStackTrace();
-                viewListener.onDIsconnect(e.getLocalizedMessage());
-                Log.e("Reading ex>> ", e.getLocalizedMessage() + "");
-            }
+            receiveData();
+
         }
 
-        private void receiveData() throws IOException {
+        private void receiveData() {
             if (socket != null) {
-                InputStream socketInputStream = socket.getInputStream();
-                byte[] buffer = new byte[1024];
-                int bytes;
+                InputStream socketInputStream = null;
+                try {
+                    socketInputStream = socket.getInputStream();
+                    byte[] buffer = new byte[256];
+                    int bytes;
 
-                // Keep looping to listen for received messages
+                    // Keep looping to listen for received messages
+                    boolean isContinue = true;
+                    if(socketInputStream.available()>0) {
+                        while (isContinue) {
+                            try {
+                                bytes = socketInputStream.read(buffer);
+                                if (bytes != -1) {
+                                    String readMessage = new String(buffer, 0, bytes);
+                                    if (readMessage.contains("|")) {
+                                        String[] arrayString = readMessage.replace("\r\n","").split("\\|");
+                                        String distance = arrayString[0];
+                                        String battery = arrayString[1];
 
-                while (true) {
-                    bytes = socketInputStream.read(buffer);
-                    //read bytes from input buffer
-                    if (bytes != -1) {
-                        String readMessage = new String(buffer, 0, bytes);
-                        if (readMessage.contains("|")) {
-                            String[] arrayString = readMessage.split("|");
-                            String distance = arrayString[0];
-                            String battery = arrayString[1];
+                                        Intent intent = new Intent(bluetooth_receiver);
+                                        intent.putExtra("distance", distance);
+                                        intent.putExtra("battery", battery);
+                                       context.sendBroadcast(intent);
 
-                            Intent intent = new Intent(bluetooth_receiver);
-                            intent.putExtra("distance", distance);
-                            intent.putExtra("battery", battery);
-                            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                    }
+                                    Log.e("Reading >> ", readMessage + "");
+                                }
+                                // Send the obtained bytes to the UI Activity via handler
+                                Log.e("Reading >> ", "no data");
+                            } catch (IOException e) {
+                                isContinue = false;
+                                if (e != null)
+                                    viewListener.onDIsconnect(e.getLocalizedMessage());
+                                else viewListener.onDIsconnect("Input Socket null");
+                                e.printStackTrace();
+                            }
+                            //read bytes from input buffer
 
                         }
-                        Log.e("Reading >> ", readMessage + "");
                     }
-                    // Send the obtained bytes to the UI Activity via handler
-                    Log.e("Reading >> ", "no data");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    if(e!=null)
+                        viewListener.onDIsconnect(e.getLocalizedMessage());
+                    else  viewListener.onDIsconnect("Input Socket null");
+                    e.printStackTrace();
                 }
 
 

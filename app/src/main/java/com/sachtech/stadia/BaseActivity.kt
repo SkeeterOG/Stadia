@@ -12,8 +12,7 @@ import com.sachtech.stadia.utils.BluetoothConnector
 import com.sachtech.stadia.utils.PrefKey
 
 abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
-    val sharedPreference: SharedPreferences by lazy {
-        getSharedPreferences(
+    val sharedPreference: SharedPreferences by lazy { getSharedPreferences(
             "PREFERENCE_NAME",
             Context.MODE_PRIVATE
         )
@@ -34,8 +33,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         filter1.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter1.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         registerReceiver(pairedBluetoothReceiver, filter1)
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(broadCastReceiver, IntentFilter("receive broadcast"))
+        registerReceiver(broadCastReceiver, IntentFilter("BLUETOOTH_RECEIVER"))
 
     }
 
@@ -95,8 +93,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     override fun onPause() {
         super.onPause()
         unregisterReceiver(pairedBluetoothReceiver)
-        LocalBroadcastManager.getInstance(this)
-            .unregisterReceiver(broadCastReceiver)
+        unregisterReceiver(broadCastReceiver)
     }
 
     fun connectBt(device: BluetoothDevice) {
@@ -152,7 +149,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         }
     }
 
-    override fun onDIsconnect(error: String) {
+    override fun onDIsconnect(error: String?) {
         onDisconnect()
 
     }

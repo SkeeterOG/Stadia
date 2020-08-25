@@ -18,12 +18,14 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
     private var customDialogFragment: CustomDialogFragment? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        tv_CurrentOffsetValue.text=sharedPreference.getInt(PrefKey.Height_Inches,0).toString()
-
         setContentView(R.layout.activity_setupstadia)
+        tv_CurrentOffsetValue.text=sharedPreference.getInt(PrefKey.Height_Inches,0).toString()
         btn_settings.setOnClickListener(this)
         btn_runstadia.setOnClickListener(this)
         btn_enter.setOnClickListener(this)
+        iv_bluetooth.setOnClickListener {
+            setupConnection()
+        }
     }
 
     override fun onHeightAlert() {
