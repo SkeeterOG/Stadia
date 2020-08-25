@@ -4,8 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.sachtech.stadia.utils.BluetoothConnector
+import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_description.*
 
 class DescriptionActivity : BaseActivity(), View.OnClickListener {
@@ -18,27 +17,30 @@ class DescriptionActivity : BaseActivity(), View.OnClickListener {
         btn_standBy.setOnClickListener(this)
     }
 
-    override fun onHeightAlert() {
-
-        tv_warning.visibility = View.VISIBLE
-    }
 
     @SuppressLint("SetTextI18n")
     override fun onReceivedData(height: String, battery: String) {
         if (height.isNotEmpty()) {
-            if(height.contains("StandBy",true)){
-                tv_heightftvalue.text=""+height
+            if (height.contains("StandBy", true)) {
+                tv_heightftvalue.text = "" + height
                 tv_warning.visibility = View.GONE
-            }else {
+            } else {
                 val heightInt = height.toInt()
                 tv_heightftvalue.text = "" + (heightInt * 0.0328)
-
+                if (isHeightAllert(heightInt)) {
+                    if (sharedPreference?.getBoolean(PrefKey.VisualAlert, false)) {
+                        tv_warning.visibility = View.VISIBLE
+                    }
+                } else {
+                    tv_warning.visibility = View.GONE
+                }
 
             }
 
         }
 
     }
+
 
     override fun onConnect() {
 
@@ -53,11 +55,11 @@ class DescriptionActivity : BaseActivity(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.btn_activeMode -> {
-           writeData("0")
-
+                sharedPreference.edit().putString(PrefKey.DATA_COMMAND,"0").apply()
             }
             R.id.btn_standBy -> {
-                writeData("1")
+                sharedPreference.edit().putString(PrefKey.DATA_COMMAND,"1").apply()
+
             }
 
         }

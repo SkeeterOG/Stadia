@@ -28,11 +28,6 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    override fun onHeightAlert() {
-
-
-    }
-
     override fun onReceivedData(height: String, battery: String) {
 
     }

@@ -6,6 +6,7 @@ object PrefKey {
     val VoiceAlert:String="VoiceAlert"
     val seekbarValue:String="SeekbarValue"
     val Height_Inches:String="Height_Inches"
+    val DATA_COMMAND:String="DATA_COMMAND"
 
 
 }
