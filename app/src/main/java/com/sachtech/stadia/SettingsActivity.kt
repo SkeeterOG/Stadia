@@ -1,20 +1,19 @@
 package com.sachtech.stadia
 
-import android.content.SharedPreferences
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.SeekBar
+import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_settings.*
 
 
 class SettingsActivity : BaseActivity() {
 
-
+    val audioPlayerManager by lazy { AudioPlayerManager(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-       checkBox_VisualAlert.setOnCheckedChangeListener { compoundButton, isChecked ->
+        checkBox_VisualAlert.setOnCheckedChangeListener { compoundButton, isChecked ->
 
             if (isChecked) {
                 sharedPreference.edit()?.putBoolean(PrefKey.VisualAlert, true)?.apply()
@@ -62,7 +61,7 @@ class SettingsActivity : BaseActivity() {
         )
 
         btn_play.setOnClickListener {
-            audioPlayerManager.startMediaPlayer(R.raw.beep2)
+            audioPlayerManager.startMediaPlayer(R.raw.beep2,false)
         }
 
     }
@@ -71,7 +70,6 @@ class SettingsActivity : BaseActivity() {
         super.onResume()
         showSelectedValues()
     }
-
 
 
     override fun onReceivedData(height: String, battery: String) {
@@ -99,15 +97,17 @@ class SettingsActivity : BaseActivity() {
 
 
 
-            seek_bar.setProgress(sharedPreference.getInt(PrefKey.seekbarValue, 0))
-            seekbar_Value.setText((sharedPreference.getInt(PrefKey.seekbarValue, 0)).toString()
-            )
+        seek_bar.setProgress(sharedPreference.getInt(PrefKey.seekbarValue, 0))
+        seekbar_Value.setText(
+            (sharedPreference.getInt(PrefKey.seekbarValue, 0)).toString()
+        )
 
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        audioPlayerManager.releaseMediaPlayer()
     }
 
 }

@@ -91,14 +91,15 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
 
         }
     }
-    fun startMediaPlayer(url: Int) {
+    fun startMediaPlayer(url: Int,isLoop:Boolean) {
         //mediaPlayer = MediaPlayer.create(context, Uri.parse(url))
         mediaPlayer = MediaPlayer.create(context,url)
         if (mediaPlayer?.isPlaying == true) mediaPlayer?.stop()
         if (requestAudioFocus() == true) {
             mediaPlayer?.setAudioAttributes(getAudioAttributes())
-
+             mediaPlayer?.isLooping=isLoop
             mediaPlayer?.start()
+
           //  mediaPlayer?.prepareAsync()
 
             mediaPlayer?.setOnCompletionListener {

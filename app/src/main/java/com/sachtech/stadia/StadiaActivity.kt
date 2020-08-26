@@ -7,7 +7,7 @@ import android.widget.Toast
 import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_description.*
 
-class DescriptionActivity : BaseActivity(), View.OnClickListener {
+class StadiaActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

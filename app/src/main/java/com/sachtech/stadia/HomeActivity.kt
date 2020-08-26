@@ -1,18 +1,10 @@
 package com.sachtech.stadia
 
-import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentManager
-import com.sachtech.stadia.base.BaseInteractionListener
 import com.sachtech.stadia.utils.openA
 import kotlinx.android.synthetic.main.activity_home.*
 
@@ -30,6 +22,7 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
 
 
         fragmentManager = supportFragmentManager
+        startService(Intent(this,StadiaService::class.java))
 
     }
 
@@ -43,7 +36,7 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(p0: View?) {
         when (p0?.id) {
-            R.id.btn_runStadia -> openA<DescriptionActivity>()
+            R.id.btn_runStadia -> openA<StadiaActivity>()
             R.id.btn_setUpStadia -> openA<SetUpStadiaActivity>()
 
         }

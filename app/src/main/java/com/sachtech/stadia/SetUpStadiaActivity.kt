@@ -26,20 +26,28 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         iv_bluetooth.setOnClickListener {
             setupConnection()
         }
+        btn_calibrate.setOnClickListener {
+
+            val calibrate_value = sharedPreference.getInt("Calibrate_value", 0)
+            tv_CurrentOffsetValue.text=calibrate_value.toString()
+            sharedPreference.edit().putInt(PrefKey.Height_Inches,tv_CurrentOffsetValue.text.toString().toInt()).apply()
+        }
     }
 
     override fun onReceivedData(height: String, battery: String) {
-
+        onConnect()
     }
 
     override fun onConnect() {
-        if (customDialogFragment != null) {
-            if (customDialogFragment!!.dialog?.isShowing == true) {
-                customDialogFragment?.dismiss()
+        if(tv_tapButton.text.toString()!=getString(R.string.connected)) {
+            if (customDialogFragment != null) {
+                if (customDialogFragment!!.dialog?.isShowing == true) {
+                    customDialogFragment?.dismiss()
+                }
             }
+            tv_tapButton.text = getString(R.string.connected)
+            tv_tapButton.setTextColor(Color.GREEN)
         }
-        tv_tapButton.text = getString(R.string.connected)
-        tv_tapButton.setTextColor(Color.GREEN)
     }
 
     override fun onDisconnect() {
@@ -109,7 +117,7 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when (p0?.id) {
             R.id.btn_settings -> openA<SettingsActivity>()
-            R.id.btn_runstadia -> openA<DescriptionActivity>()
+            R.id.btn_runstadia -> openA<StadiaActivity>()
             R.id.btn_enter -> {
 
                 tv_CurrentOffsetValue.text = et_inches.text.toString()
