@@ -10,6 +10,7 @@ import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.BluetoothConnector
 import com.sachtech.stadia.utils.BluetoothConnector.BROADCAST_CONNECT_DEVICE
 import com.sachtech.stadia.utils.PrefKey
+import kotlin.math.roundToInt
 
 abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     val sharedPreference: SharedPreferences by lazy {
@@ -73,11 +74,28 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     abstract fun onDisconnect()
 
      fun isHeightAllert(heightInt: Int): Boolean {
+         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false) == true){
+             val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.01
+             if(i.toInt()==0)
+                 return false
+             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+         }
+         else{
+             val heightTOInch=(heightInt*0.393701).roundToInt()
+             val i = (heightTOInch - sharedPreference.getInt(PrefKey.Height_Inches, 0))/12
+             if(i.toInt()==0)
+                 return false
+             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+
+         }
+
+/*
 
         val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.0328
          if(i.toInt()==0)
              return false
         return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+*/
 
     }
 

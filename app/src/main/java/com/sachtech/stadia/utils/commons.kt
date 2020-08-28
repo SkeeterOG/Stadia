@@ -16,3 +16,6 @@ fun Context.sharedPreferences(){
     val mSharedPreferences: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     var mEditor: SharedPreferences.Editor = mSharedPreferences.edit()
 }
+fun String.uptoTwoDecimal(): String {
+    return String.format("%.2f", this.toDouble());
+}

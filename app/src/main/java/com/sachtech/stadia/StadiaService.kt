@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.BluetoothConnector
 import com.sachtech.stadia.utils.PrefKey
+import kotlin.math.roundToInt
 
 class StadiaService :Service(), BluetoothConnectionListener {
     val audioPlayerManager by lazy { AudioPlayerManager(this) }
@@ -66,7 +67,7 @@ class StadiaService :Service(), BluetoothConnectionListener {
         intentFilter.addAction(BluetoothConnector.BROADCAST_CONNECT_DEVICE)
         intentFilter.addAction(BluetoothConnector.bluetooth_receiver)
         registerReceiver(broadCastReceiver, intentFilter)
-        startNotification()
+        //startNotification()
         return Service.START_NOT_STICKY
     }
 
@@ -91,15 +92,31 @@ class StadiaService :Service(), BluetoothConnectionListener {
         sendBroadcastAction(BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED)
     }
     fun connectBt(device: BluetoothDevice) {
-
         bluetoothConnector.connect(device)
     }
     fun isHeightAllert(heightInt: Int): Boolean {
+        if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false) == true){
+            val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.01
+            if(i.toInt()==0)
+                return false
+            return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+        }
+        else{
+            val heightTOInch=(heightInt*0.393701).roundToInt()
+            val i = (heightTOInch - sharedPreference.getInt(PrefKey.Height_Inches, 0))/12
+            if(i.toInt()==0)
+                return false
+            return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+
+        }
+
+/*
 
         val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.0328
-        if(i.toInt()==0)
-            return false
+         if(i.toInt()==0)
+             return false
         return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+*/
 
     }
     fun playHeightAlert(){
@@ -110,7 +127,7 @@ class StadiaService :Service(), BluetoothConnectionListener {
             audioPlayerManager.startMediaPlayer(R.raw.beep2,false)
         }
     }
-    private fun startNotification() {
+   /* private fun startNotification() {
 
         //Sets an ID for the notification
         val mNotificationId = 1
@@ -136,7 +153,7 @@ class StadiaService :Service(), BluetoothConnectionListener {
             .build()
         notification.flags = Notification.FLAG_ONGOING_EVENT
         startForeground(15101, notification)
-    }
+    }*/
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager): String {

@@ -20,6 +20,8 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setupstadia)
         tv_CurrentOffsetValue.text=sharedPreference.getInt(PrefKey.Height_Inches,0).toString()
+
+
         btn_settings.setOnClickListener(this)
         btn_runstadia.setOnClickListener(this)
         btn_enter.setOnClickListener(this)
@@ -34,6 +36,16 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,true)){
+            et_inches.hint="Cm"
+        }
+        else{
+            et_inches.hint="Inches"
+
+        }
+    }
     override fun onReceivedData(height: String, battery: String) {
         onConnect()
     }
