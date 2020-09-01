@@ -8,7 +8,9 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.BluetoothConnector
+import com.sachtech.stadia.utils.BluetoothConnector.BROADCAST_CONNECT_DEVICE
 import com.sachtech.stadia.utils.PrefKey
+import kotlin.math.roundToInt
 
 abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     val sharedPreference: SharedPreferences by lazy {
@@ -17,8 +19,6 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
             Context.MODE_PRIVATE
         )
     }
-    val audioPlayerManager by lazy { AudioPlayerManager(this) }
-    val bluetoothConnector by lazy { BluetoothConnector.getInstance(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +30,16 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     override fun onResume() {
 
         super.onResume()
-        bluetoothConnector.setBluetoothConnetionListener(this)
+
         val filter1 = IntentFilter()
         filter1.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter1.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         registerReceiver(pairedBluetoothReceiver, filter1)
-        registerReceiver(broadCastReceiver, IntentFilter(BluetoothConnector.bluetooth_receiver))
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(BluetoothConnector.BROADCAST_DEVICE_CONNECTED)
+        intentFilter.addAction(BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED)
+        intentFilter.addAction(BluetoothConnector.bluetooth_receiver)
+        registerReceiver(broadCastReceiver, intentFilter)
 
     }
 
@@ -48,16 +52,15 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
             runOnUiThread {
                 when (intent?.action!!) {
+                    BluetoothConnector.BROADCAST_DEVICE_CONNECTED->{
+                        onConnect()
+                    }
+                    BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED->{
+                        onDisconnect()
+                    }
+
                     BluetoothConnector.bluetooth_receiver -> {
                         onReceivedData(distance, battery)
-                        if(!distance.isEmpty()&& !distance.contains("STANDBY")) {
-
-                            if (isHeightAllert(distance.toInt())) {
-                                playHeightAlert()
-                            } else {
-                                audioPlayerManager.stopMedaiPlayer()
-                            }
-                        }
                     }
 
                 }
@@ -71,9 +74,28 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     abstract fun onDisconnect()
 
      fun isHeightAllert(heightInt: Int): Boolean {
+         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false) == true){
+             val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.01
+             if(i.toInt()==0)
+                 return false
+             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+         }
+         else{
+             val heightTOInch=(heightInt*0.393701).roundToInt()
+             val i = (heightTOInch - sharedPreference.getInt(PrefKey.Height_Inches, 0))/12
+             if(i.toInt()==0)
+                 return false
+             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+
+         }
+
+/*
 
         val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.0328
+         if(i.toInt()==0)
+             return false
         return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
+*/
 
     }
 
@@ -84,13 +106,12 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     }
 
     fun connectBt(device: BluetoothDevice) {
-
-        bluetoothConnector.connect(device)
+       val intent=Intent(BROADCAST_CONNECT_DEVICE)
+        intent.putExtra("device",device)
+       sendBroadcast(intent)
     }
 
-    fun writeData(data: String) {
-        bluetoothConnector.sendData(data)
-    }
+
 
     override fun onDeviceConnect(device: BluetoothDevice?) {
         runOnUiThread {
@@ -146,14 +167,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        audioPlayerManager.releaseMediaPlayer()
-    }
-  fun playHeightAlert(){
 
-      if (sharedPreference.getBoolean(PrefKey.VoiceAlert, false)) {
-          audioPlayerManager.startMediaPlayer(R.raw.beep)
-      }else if (sharedPreference.getBoolean(PrefKey.SoundAlert, false)) {
-          audioPlayerManager.startMediaPlayer(R.raw.beep2)
-      }
     }
+
 }

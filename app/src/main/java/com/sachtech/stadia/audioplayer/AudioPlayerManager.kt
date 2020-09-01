@@ -1,6 +1,7 @@
 package com.musify.audioplayer
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -8,9 +9,18 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import com.sachtech.stadia.utils.PrefKey
+import kotlinx.android.synthetic.main.activity_description.*
 
 class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChangeListener {
      var maudioPlayerListener :AudioPlayerListener?=null
+    val sharedPreference: SharedPreferences by lazy {
+        context.getSharedPreferences(
+            "PREFERENCE_NAME",
+            Context.MODE_PRIVATE
+        )
+    }
+
     override fun onAudioFocusChange(focusState: Int) {
         when (focusState) {
             AudioManager.AUDIOFOCUS_GAIN -> {
@@ -91,14 +101,20 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
 
         }
     }
-    fun startMediaPlayer(url: Int) {
+    fun startMediaPlayer(url: Int,isLoop:Boolean) {
         //mediaPlayer = MediaPlayer.create(context, Uri.parse(url))
         mediaPlayer = MediaPlayer.create(context,url)
         if (mediaPlayer?.isPlaying == true) mediaPlayer?.stop()
         if (requestAudioFocus() == true) {
             mediaPlayer?.setAudioAttributes(getAudioAttributes())
-
+             mediaPlayer?.isLooping=isLoop
             mediaPlayer?.start()
+            if (sharedPreference?.getBoolean(PrefKey.isMute, false)) {
+                //mute
+                mute()
+            } else {
+                unMute()
+            }
           //  mediaPlayer?.prepareAsync()
 
             mediaPlayer?.setOnCompletionListener {
@@ -135,6 +151,13 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
 
 
         }
+    }
+    fun mute(){
+        mediaPlayer?.setVolume(0F, 0F);
+
+    }
+    fun unMute(){
+        mediaPlayer?.setVolume(1F, 1F)
     }
 
     fun setAudioPlayerListener(audioPlayerListener: AudioPlayerListener){

@@ -29,6 +29,9 @@ import java.util.UUID;
 public class BluetoothConnector {
 
     public static final String bluetooth_receiver = "BLUETOOTH_RECEIVER";
+    public static final String BROADCAST_CONNECT_DEVICE = "BROADCAST_CONNECT_DEVICE";
+    public static final String BROADCAST_DEVICE_CONNECTED = "BROADCAST_DEVICE_CONNECTED";
+    public static final String BROADCAST_DEVICE_DISCONNECTED = "BROADCAST_DEVICE_DISCONNECTED";
     private Context context;
     // private BluetoothSocketWrapper bluetoothSocket;
     private BluetoothSocket mBluetoothSocket;
@@ -85,6 +88,7 @@ public class BluetoothConnector {
 
             // }
             success = true;
+
             viewListener.onDeviceConnect(device);
         } catch (Exception e) {
             //mBluetoothSocket = null;
@@ -96,6 +100,7 @@ public class BluetoothConnector {
         }*/
         return mBluetoothSocket;
     }
+
 
     private void sendInfoCommand() {
         try {
@@ -141,6 +146,7 @@ public class BluetoothConnector {
             Log.e("send data ex>> ", e.getLocalizedMessage() + "");
         }
     }
+
 
     public interface BluetoothSocketWrapper {
 
@@ -303,6 +309,9 @@ public class BluetoothConnector {
                                         intent.putExtra("distance", distance);
                                         intent.putExtra("battery", battery);
                                         context.sendBroadcast(intent);
+                                        SharedPreferences sharedPreferences = context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE);
+                                        if(!distance.isEmpty()&&!distance.contains("STANDBY"))
+                                        sharedPreferences.edit().putInt("Calibrate_value",Integer.parseInt(distance)).apply();
                                         sendInfoCommand();
                                     }
                                     Log.e("Reading >> ", readMessage + "");

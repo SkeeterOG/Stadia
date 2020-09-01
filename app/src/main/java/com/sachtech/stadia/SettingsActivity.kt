@@ -1,20 +1,52 @@
 package com.sachtech.stadia
 
-import android.content.SharedPreferences
-import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.SeekBar
+import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_settings.*
 
 
 class SettingsActivity : BaseActivity() {
+    private lateinit var selectedRadioButton: RadioButton
 
-
+    val audioPlayerManager by lazy { AudioPlayerManager(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-       checkBox_VisualAlert.setOnCheckedChangeListener { compoundButton, isChecked ->
+        if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
+            radioMetric.isChecked = true
+            radioImperical.isChecked = false
+        } else {
+            radioMetric.isChecked = false
+            radioImperical.isChecked = true
+
+        }
+        setUpScrollerTitle();
+
+        radioGroup.setOnCheckedChangeListener { radioGroup, i ->
+            val selectedRadioButtonId: Int = radioGroup.checkedRadioButtonId
+            when (radioGroup.checkedRadioButtonId) {
+                R.id.radioMetric -> {
+                    sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, true).apply()
+                }
+                R.id.radioImperical -> {
+                    sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, false).apply()
+                }
+            }
+            setUpScrollerTitle();
+
+
+
+
+        }
+
+
+
+        checkBox_VisualAlert.setOnCheckedChangeListener { compoundButton, isChecked ->
 
             if (isChecked) {
                 sharedPreference.edit()?.putBoolean(PrefKey.VisualAlert, true)?.apply()
@@ -27,6 +59,7 @@ class SettingsActivity : BaseActivity() {
         checkBox_soundAlert.setOnCheckedChangeListener { compoundButton, isChecked ->
             if (isChecked) {
                 sharedPreference.edit()?.putBoolean(PrefKey.SoundAlert, true)?.apply()
+
             } else {
                 sharedPreference.edit()?.putBoolean(PrefKey.SoundAlert, false)?.apply()
 
@@ -62,16 +95,24 @@ class SettingsActivity : BaseActivity() {
         )
 
         btn_play.setOnClickListener {
-            audioPlayerManager.startMediaPlayer(R.raw.beep2)
+            audioPlayerManager.startMediaPlayer(R.raw.beep2, false)
         }
 
+    }
+
+    private fun setUpScrollerTitle() {
+        if (sharedPreference.getBoolean(PrefKey.isMetricMeasurement, false)) {
+            tv_alertHeight.text = "Alert Height Adjustment(meter)"
+
+        } else {
+            tv_alertHeight.text = "Alert Height Adjustment(inches)"
+        }
     }
 
     override fun onResume() {
         super.onResume()
         showSelectedValues()
     }
-
 
 
     override fun onReceivedData(height: String, battery: String) {
@@ -99,15 +140,25 @@ class SettingsActivity : BaseActivity() {
 
 
 
-            seek_bar.setProgress(sharedPreference.getInt(PrefKey.seekbarValue, 0))
-            seekbar_Value.setText((sharedPreference.getInt(PrefKey.seekbarValue, 0)).toString()
-            )
+
+
+
+
+
+
+
+
+        seek_bar.setProgress(sharedPreference.getInt(PrefKey.seekbarValue, 0))
+        seekbar_Value.setText(
+            (sharedPreference.getInt(PrefKey.seekbarValue, 0)).toString()
+        )
 
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        audioPlayerManager.releaseMediaPlayer()
     }
 
 }

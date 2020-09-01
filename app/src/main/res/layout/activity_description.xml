@@ -12,6 +12,7 @@
         android:layout_margin="18dp"
         android:text="@string/height_ft"
         android:textColor="#000"
+        android:visibility="gone"
         android:textSize="@dimen/_48ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_28sdp"
         android:textColor="#000"
-        android:textSize="@dimen/_58ssp"
+        android:text="@string/height_ft"
+        android:textSize="@dimen/_42ssp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_heightft" />

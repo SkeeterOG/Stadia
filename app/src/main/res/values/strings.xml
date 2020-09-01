@@ -10,7 +10,7 @@
     <string name="enter">ENTER</string>
     <string name="settings">SETTINGS</string>
     <string name="run_stadia">RUN STADIA</string>
-    <string name="alert_height_adjustment_feet">Alert Height Adjustment (feet)</string>
+    <string name="alert_height_adjustment_feet">Alert Height Adjustment</string>
     <string name="intervals_are">Intervals are:</string>
     <string name="height_batt_48_duration_clock2_on_off">Height Batt 48 duration clock2 ON/OFF</string>
     <string name="active_mode">Active Mode</string>
@@ -24,4 +24,6 @@
     <string name="currentoffset_in_inches">Current Offset In Inches</string>
     <string name="inches">Inches</string>
     <string name="connected">Connected</string>
+    <string name="metric">Metric</string>
+    <string name="imperical">Imperical</string>
 </resources>
