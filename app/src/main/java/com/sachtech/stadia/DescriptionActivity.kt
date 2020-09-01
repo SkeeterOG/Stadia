@@ -41,7 +41,7 @@ class DescriptionActivity : BaseActivity(), View.OnClickListener {
 
     }
     fun String.uptoTwoDecimal(): String {
-      return  String.format("%.2f", this.toDouble());
+      return  String.format("%.1f", this.toDouble());
     }
 
 
