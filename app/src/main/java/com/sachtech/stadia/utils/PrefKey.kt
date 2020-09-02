@@ -7,7 +7,7 @@ object PrefKey {
     val isMute:String="Mute"
     val isMetricMeasurement:String="isMetricMeasurement"
     val seekbarValue:String="SeekbarValue"
-    val Height_Inches:String="Height_Inches"
+    val HEIGHT_OFFSET:String="HEIGHT_OFFSET"
     val DATA_COMMAND:String="DATA_COMMAND"
 
 

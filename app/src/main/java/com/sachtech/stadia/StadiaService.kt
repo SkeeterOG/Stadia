@@ -9,10 +9,8 @@ import android.content.*
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import com.musify.audioplayer.AudioPlayerManager
-import com.sachtech.stadia.utils.BluetoothConnector
-import com.sachtech.stadia.utils.PrefKey
+import com.sachtech.stadia.utils.*
 import kotlin.math.roundToInt
 
 class StadiaService :Service(), BluetoothConnectionListener {
@@ -95,16 +93,14 @@ class StadiaService :Service(), BluetoothConnectionListener {
         bluetoothConnector.connect(device)
     }
     fun isHeightAllert(heightInt: Int): Boolean {
-        if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false) == true){
-            val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.01
-            if(i.toInt()==0)
+        if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)){
+            val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).cmtoMeters()
+            if(i.toInt()<=0)
                 return false
             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
-        }
-        else{
-            val heightTOInch=(heightInt*0.393701).roundToInt()
-            val i = (heightTOInch - sharedPreference.getInt(PrefKey.Height_Inches, 0))/12
-            if(i.toInt()==0)
+        } else{
+            val i = (heightInt.cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
+            if(i.toInt()<=0)
                 return false
             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
 
