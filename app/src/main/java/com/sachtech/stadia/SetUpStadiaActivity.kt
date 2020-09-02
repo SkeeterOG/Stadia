@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.view.View
 import androidx.core.app.ActivityCompat
 import com.sachtech.stadia.utils.PrefKey
+import com.sachtech.stadia.utils.cmtoInches
 import com.sachtech.stadia.utils.openA
 import kotlinx.android.synthetic.main.activity_setupstadia.*
 
@@ -19,7 +20,7 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setupstadia)
-        tv_CurrentOffsetValue.text=sharedPreference.getInt(PrefKey.Height_Inches,0).toString()
+        tv_CurrentOffsetValue.text=sharedPreference.getInt(PrefKey.HEIGHT_OFFSET,0).toString()
 
 
         btn_settings.setOnClickListener(this)
@@ -31,8 +32,13 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         btn_calibrate.setOnClickListener {
 
             val calibrate_value = sharedPreference.getInt("Calibrate_value", 0)
-            tv_CurrentOffsetValue.text=calibrate_value.toString()
-            sharedPreference.edit().putInt(PrefKey.Height_Inches,tv_CurrentOffsetValue.text.toString().toInt()).apply()
+            if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,true)){
+                tv_CurrentOffsetValue.text=calibrate_value.toString()
+            } else{
+                tv_CurrentOffsetValue.text=calibrate_value.cmtoInches().toString()
+            }
+
+            sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,tv_CurrentOffsetValue.text.toString().toInt()).apply()
         }
     }
 
@@ -133,7 +139,7 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
             R.id.btn_enter -> {
 
                 tv_CurrentOffsetValue.text = et_inches.text.toString()
-                sharedPreference.edit().putInt(PrefKey.Height_Inches,et_inches.text.toString().toInt()).apply()
+                sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,et_inches.text.toString().toInt()).apply()
             }
         }
     }

@@ -6,10 +6,8 @@ import android.content.*
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.musify.audioplayer.AudioPlayerManager
-import com.sachtech.stadia.utils.BluetoothConnector
+import com.sachtech.stadia.utils.*
 import com.sachtech.stadia.utils.BluetoothConnector.BROADCAST_CONNECT_DEVICE
-import com.sachtech.stadia.utils.PrefKey
 import kotlin.math.roundToInt
 
 abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
@@ -74,16 +72,15 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     abstract fun onDisconnect()
 
      fun isHeightAllert(heightInt: Int): Boolean {
-         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false) == true){
-             val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.01
-             if(i.toInt()==0)
+         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)){
+             val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).cmtoMeters()
+             if(i.toInt()<=0)
                  return false
              return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
          }
          else{
-             val heightTOInch=(heightInt*0.393701).roundToInt()
-             val i = (heightTOInch - sharedPreference.getInt(PrefKey.Height_Inches, 0))/12
-             if(i.toInt()==0)
+             val i = (heightInt.cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
+             if(i.toInt()<=0)
                  return false
              return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
 

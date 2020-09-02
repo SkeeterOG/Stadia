@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.musify.audioplayer.AudioPlayerManager
-import com.sachtech.stadia.utils.PrefKey
-import com.sachtech.stadia.utils.uptoTwoDecimal
+import com.sachtech.stadia.utils.*
 import kotlinx.android.synthetic.main.activity_description.*
-import kotlin.math.roundToInt
 
 class StadiaActivity : BaseActivity(), View.OnClickListener {
     val audioPlayerManager by lazy { AudioPlayerManager(this) }
@@ -35,14 +33,22 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                 tv_heightftvalue.text = "" + height
                 tv_warning.visibility = View.GONE
             } else {
-                val heightInt = height.toInt()
-
-                if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false) == true){
-                    tv_heightftvalue.text = "" + (heightInt/10).toString().uptoTwoDecimal()
-                }
-                else{
-
-                    tv_heightftvalue.text = "" + (heightInt * 0.0328).toString().uptoTwoDecimal()
+                var heightInt = height.toInt()
+                if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
+                    heightInt -= sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
+                    if (heightInt <= 0) {
+                        tv_heightftvalue.text = "0"
+                    } else
+                        tv_heightftvalue.text =
+                            "" + (heightInt.cmtoMeters()).toString().uptoTwoDecimal()
+                } else {
+                    heightInt =
+                        heightInt.cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
+                    if (heightInt <= 0) {
+                        tv_heightftvalue.text = "0"
+                    } else
+                        tv_heightftvalue.text =
+                            "" + (heightInt.inchestoFeet()).toString().uptoTwoDecimal()
                 }
 
 
@@ -61,8 +67,6 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
         }
 
     }
-
-
 
 
     override fun onConnect() {
