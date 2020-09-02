@@ -31,7 +31,7 @@ class SettingsActivity : BaseActivity() {
             val selectedRadioButtonId: Int = radioGroup.checkedRadioButtonId
             when (radioGroup.checkedRadioButtonId) {
                 R.id.radioMetric -> {
-                    sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, true).apply()
+                    sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, false).apply()
                 }
                 R.id.radioImperical -> {
                     sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, false).apply()

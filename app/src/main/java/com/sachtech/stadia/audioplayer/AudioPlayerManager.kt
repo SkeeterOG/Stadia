@@ -6,6 +6,7 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.MediaPlayer.*
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -34,7 +35,7 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
                 // Lost focus for an unbounded amount of time: stop playback and release media player
                 if (mediaPlayer?.isPlaying == true) mediaPlayer?.stop()
                 mediaPlayer?.release()
-                mediaPlayer = null
+               // mediaPlayer = null
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ->
                 // Lost focus for a short time, but we have to stop
@@ -51,7 +52,7 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
     private var mediaPlayer: MediaPlayer? = null
 
     init {
-        mediaPlayer = MediaPlayer()
+        //mediaPlayer = MediaPlayer()
     }
 
     private var audioManager: AudioManager? = null
@@ -74,19 +75,19 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
                 if (mediaPlayer?.isPlaying == false)
                     mediaPlayer?.start()
             }
-            mediaPlayer?.setOnErrorListener(object : MediaPlayer.OnErrorListener {
+            mediaPlayer?.setOnErrorListener(object : OnErrorListener {
                 override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
                     maudioPlayerListener?.onError()
                     when (what) {
-                        MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK ->
+                        MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK ->
                             Log.d(
                             "MediaPlayer Error",
                             "MEDIA ERROR NOT VALID FOR PROGRESSIVE PLAYBACK $extra")
-                        MediaPlayer.MEDIA_ERROR_SERVER_DIED ->
+                        MEDIA_ERROR_SERVER_DIED ->
                             Log.d(
                             "MediaPlayer Error",
                             "MEDIA ERROR SERVER DIED $extra")
-                        MediaPlayer.MEDIA_ERROR_UNKNOWN ->
+                        MEDIA_ERROR_UNKNOWN ->
                             Log.d(
                             "MediaPlayer Error",
                             "MEDIA ERROR UNKNOWN $extra")
@@ -103,53 +104,62 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
     }
     fun startMediaPlayer(url: Int,isLoop:Boolean) {
         //mediaPlayer = MediaPlayer.create(context, Uri.parse(url))
-        mediaPlayer = MediaPlayer.create(context,url)
-        if (mediaPlayer?.isPlaying == true) mediaPlayer?.stop()
-        if (requestAudioFocus() == true) {
-            mediaPlayer?.setAudioAttributes(getAudioAttributes())
-             mediaPlayer?.isLooping=isLoop
-            mediaPlayer?.start()
-            if (sharedPreference?.getBoolean(PrefKey.isMute, false)) {
-                //mute
-                mute()
-            } else {
-                unMute()
-            }
-          //  mediaPlayer?.prepareAsync()
 
-            mediaPlayer?.setOnCompletionListener {
-                releaseMediaPlayer()
-                maudioPlayerListener?.onFinish()
-            }
-            mediaPlayer?.setOnPreparedListener {
-                if (mediaPlayer?.isPlaying == false)
-                    mediaPlayer?.start()
-            }
-            mediaPlayer?.setOnErrorListener(object : MediaPlayer.OnErrorListener {
-                override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
-                    maudioPlayerListener?.onError()
-                    when (what) {
-                        MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK ->
-                            Log.d(
-                            "MediaPlayer Error",
-                            "MEDIA ERROR NOT VALID FOR PROGRESSIVE PLAYBACK $extra")
-                        MediaPlayer.MEDIA_ERROR_SERVER_DIED ->
-                            Log.d(
-                            "MediaPlayer Error",
-                            "MEDIA ERROR SERVER DIED $extra")
-                        MediaPlayer.MEDIA_ERROR_UNKNOWN ->
-                            Log.d(
-                            "MediaPlayer Error",
-                            "MEDIA ERROR UNKNOWN $extra")
-                    }
-                    return false
+
+        if (mediaPlayer==null || mediaPlayer?.isPlaying() == false) {
+               mediaPlayer = create(context,url)
+        //mediaPlayer?.stop()
+            if (requestAudioFocus() == true) {
+                mediaPlayer?.setAudioAttributes(getAudioAttributes())
+                mediaPlayer?.isLooping = isLoop
+                mediaPlayer?.start()
+                if (sharedPreference?.getBoolean(PrefKey.isMute, false)) {
+                    //mute
+                    mute()
+                } else {
+                    unMute()
                 }
-            })
-            mediaPlayer?.setOnBufferingUpdateListener { mp, percent ->
+                //  mediaPlayer?.prepareAsync()
+
+                mediaPlayer?.setOnCompletionListener {
+                    mediaPlayer?.release()
+                    // mediaPlayer?.reset()
+                    removeAudioFocus()
+                    maudioPlayerListener?.onFinish()
+                }
+                mediaPlayer?.setOnPreparedListener {
+                    if (mediaPlayer?.isPlaying == false)
+                        mediaPlayer?.start()
+                }
+                mediaPlayer?.setOnErrorListener(object : OnErrorListener {
+                    override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
+                        maudioPlayerListener?.onError()
+                        when (what) {
+                            MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK ->
+                                Log.d(
+                                    "MediaPlayer Error",
+                                    "MEDIA ERROR NOT VALID FOR PROGRESSIVE PLAYBACK $extra"
+                                )
+                            MEDIA_ERROR_SERVER_DIED ->
+                                Log.d(
+                                    "MediaPlayer Error",
+                                    "MEDIA ERROR SERVER DIED $extra"
+                                )
+                            MEDIA_ERROR_UNKNOWN ->
+                                Log.d(
+                                    "MediaPlayer Error",
+                                    "MEDIA ERROR UNKNOWN $extra"
+                                )
+                        }
+                        return false
+                    }
+                })
+                mediaPlayer?.setOnBufferingUpdateListener { mp, percent ->
+
+                }
+
 
             }
-
-
         }
     }
     fun mute(){
@@ -165,14 +175,17 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
     }
     fun stopMedaiPlayer() {
         //mediaPlayer = MediaPlayer.create(context, Uri.parse(url))
-        if (mediaPlayer?.isPlaying == true) mediaPlayer?.stop()
+        if (mediaPlayer?.isPlaying() == true) mediaPlayer?.stop()
           releaseMediaPlayer()
     }
 
     fun releaseMediaPlayer() {
-        mediaPlayer?.release()
-        removeAudioFocus()
-        mediaPlayer = null
+        if(mediaPlayer!=null) {
+            mediaPlayer?.release()
+            // mediaPlayer?.reset()
+            removeAudioFocus()
+            mediaPlayer = null
+        }
 
     }
 

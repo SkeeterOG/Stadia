@@ -20,19 +20,19 @@ fun Context.sharedPreferences(){
 fun String.uptoTwoDecimal(): String {
     return String.format("%.2f", this.toDouble());
 }
-fun Int.cmtoInches():Int{
-    return (this/2.54).roundToInt()
+fun Double.cmtoInches(): Double {
+    return (this/2.54).toString().uptoTwoDecimal().toDouble()
 
 }
-fun Int.cmtoMeters():Double{
+fun Double.cmtoMeters():Double{
     return (this/100.0)
 
 }
-fun Int.cmtoFeet():Int{
+fun Double.cmtoFeet():Int{
     return (this/30.48).roundToInt()
 
 }
-fun Int.inchestoFeet():Double{
+fun Double.inchestoFeet():Double{
     return (this/12.0)
 
 }

@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import com.sachtech.stadia.utils.PrefKey
 import com.sachtech.stadia.utils.cmtoInches
 import com.sachtech.stadia.utils.openA
+import com.sachtech.stadia.utils.uptoTwoDecimal
 import kotlinx.android.synthetic.main.activity_setupstadia.*
 
 class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
@@ -32,10 +33,10 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         btn_calibrate.setOnClickListener {
 
             val calibrate_value = sharedPreference.getInt("Calibrate_value", 0)
-            if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,true)){
+            if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,false)){
                 tv_CurrentOffsetValue.text=calibrate_value.toString()
             } else{
-                tv_CurrentOffsetValue.text=calibrate_value.cmtoInches().toString()
+                tv_CurrentOffsetValue.text=calibrate_value.toDouble().cmtoInches().toString().uptoTwoDecimal()
             }
 
             sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,tv_CurrentOffsetValue.text.toString().toInt()).apply()
@@ -44,7 +45,7 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,true)){
+        if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,false)){
             et_inches.hint="Cm"
         }
         else{

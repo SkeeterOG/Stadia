@@ -29,21 +29,28 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     override fun onReceivedData(height: String, battery: String) {
         if (height.isNotEmpty()) {
+
             if (height.contains("STANDBY", true)) {
                 tv_heightftvalue.text = "" + height
                 tv_warning.visibility = View.GONE
             } else {
-                var heightInt = height.toInt()
+                var heightInt:Double = height.toInt().toDouble()
+                if (isHeightAllert(heightInt)) {
+                    if (sharedPreference?.getBoolean(PrefKey.VisualAlert, false)) {
+                        tv_warning.visibility = View.VISIBLE
+                    }
+                } else {
+                    tv_warning.visibility = View.GONE
+                }
                 if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
                     heightInt -= sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
                     if (heightInt <= 0) {
                         tv_heightftvalue.text = "0"
                     } else
                         tv_heightftvalue.text =
-                            "" + (heightInt.cmtoMeters()).toString().uptoTwoDecimal()
+                            "" + (heightInt.toDouble().cmtoMeters()).toString().uptoTwoDecimal()
                 } else {
-                    heightInt =
-                        heightInt.cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
+                    heightInt = heightInt.toDouble().cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
                     if (heightInt <= 0) {
                         tv_heightftvalue.text = "0"
                     } else
@@ -54,13 +61,7 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
 
 
 
-                if (isHeightAllert(heightInt)) {
-                    if (sharedPreference?.getBoolean(PrefKey.VisualAlert, false)) {
-                        tv_warning.visibility = View.VISIBLE
-                    }
-                } else {
-                    tv_warning.visibility = View.GONE
-                }
+
 
             }
 

@@ -59,6 +59,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
                     BluetoothConnector.bluetooth_receiver -> {
                         onReceivedData(distance, battery)
+                        isHeightAllert(distance.toInt().toDouble())
                     }
 
                 }
@@ -71,16 +72,16 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     abstract fun onConnect()
     abstract fun onDisconnect()
 
-     fun isHeightAllert(heightInt: Int): Boolean {
+     fun isHeightAllert(heightInt: Double): Boolean {
          if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)){
-             val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).cmtoMeters()
-             if(i.toInt()<=0)
+             val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).toDouble().cmtoMeters()
+             if(i<=0)
                  return false
              return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
          }
          else{
-             val i = (heightInt.cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
-             if(i.toInt()<=0)
+             val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
+             if(i<=0)
                  return false
              return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
 

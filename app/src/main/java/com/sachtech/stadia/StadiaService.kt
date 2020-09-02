@@ -94,13 +94,13 @@ class StadiaService :Service(), BluetoothConnectionListener {
     }
     fun isHeightAllert(heightInt: Int): Boolean {
         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)){
-            val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).cmtoMeters()
-            if(i.toInt()<=0)
+            val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).toDouble().cmtoMeters()
+            if(i<=0)
                 return false
             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
         } else{
-            val i = (heightInt.cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
-            if(i.toInt()<=0)
+            val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
+            if(i<=0)
                 return false
             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
 
@@ -118,9 +118,9 @@ class StadiaService :Service(), BluetoothConnectionListener {
     fun playHeightAlert(){
 
         if (sharedPreference.getBoolean(PrefKey.VoiceAlert, false)) {
-            audioPlayerManager.startMediaPlayer(R.raw.beep,false)
+            audioPlayerManager.startMediaPlayer(R.raw.beep,true)
         }else if (sharedPreference.getBoolean(PrefKey.SoundAlert, false)) {
-            audioPlayerManager.startMediaPlayer(R.raw.beep2,false)
+            audioPlayerManager.startMediaPlayer(R.raw.beep2,true)
         }
     }
    /* private fun startNotification() {
