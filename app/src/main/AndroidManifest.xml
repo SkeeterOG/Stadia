@@ -33,7 +33,8 @@
         </activity>
         <activity android:name=".StadiaActivity" />
         <activity android:name=".SetUpStadiaActivity" />
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".SettingsActivity"
+            android:exported="true"/>
         <service android:name=".StadiaService"
                  android:foregroundServiceType="connectedDevice"/>
     </application>

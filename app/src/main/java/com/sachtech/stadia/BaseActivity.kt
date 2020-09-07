@@ -75,13 +75,13 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
      fun isHeightAllert(heightInt: Double): Boolean {
          if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)){
              val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).toDouble().cmtoMeters()
-             if(i<=0)
+             if(i<0)
                  return false
              return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
          }
          else{
              val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
-             if(i<=0)
+             if(i<0)
                  return false
              return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
 

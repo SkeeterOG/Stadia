@@ -1,6 +1,8 @@
 package com.sachtech.stadia
 
 import android.annotation.SuppressLint
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -29,12 +31,15 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     override fun onReceivedData(height: String, battery: String) {
         if (height.isNotEmpty()) {
+            val devicestatus =
+                if (sharedPreference.getString(PrefKey.DATA_COMMAND, "0") == "0") "48" else "49"
+            tv_heightbatt.text = "$height $battery $devicestatus"
 
             if (height.contains("STANDBY", true)) {
                 tv_heightftvalue.text = "" + height
                 tv_warning.visibility = View.GONE
             } else {
-                var heightInt:Double = height.toInt().toDouble()
+                var heightInt: Double = height.toInt().toDouble()
                 if (isHeightAllert(heightInt)) {
                     if (sharedPreference?.getBoolean(PrefKey.VisualAlert, false)) {
                         tv_warning.visibility = View.VISIBLE
@@ -50,7 +55,8 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                         tv_heightftvalue.text =
                             "" + (heightInt.toDouble().cmtoMeters()).toString().uptoTwoDecimal()
                 } else {
-                    heightInt = heightInt.toDouble().cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
+                    heightInt = heightInt.toDouble()
+                        .cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
                     if (heightInt <= 0) {
                         tv_heightftvalue.text = "0"
                     } else
@@ -59,12 +65,12 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                 }
 
 
-
-
-
-
             }
 
+        } else {
+            val devicestatus =
+                if (sharedPreference.getString(PrefKey.DATA_COMMAND, "0") == "0") "48" else "49"
+            tv_heightbatt.text = "$height $battery $devicestatus"
         }
 
     }
@@ -114,7 +120,8 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
 
             }
             R.id.btn_beep -> {
-                audioPlayerManager.startMediaPlayer(R.raw.beep2, true)
+                val toneG = ToneGenerator(AudioManager.STREAM_MUSIC, 300)
+                toneG?.startTone(ToneGenerator.TONE_DTMF_1, 1000)
             }
             R.id.btn_mute -> {
 
