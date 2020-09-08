@@ -11,7 +11,7 @@ import android.util.Log
 import com.sachtech.stadia.utils.PrefKey
 
 
-class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChangeListener {
+class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChangeListener{
     var maudioPlayerListener: AudioPlayerListener? = null
     val sharedPreference: SharedPreferences by lazy {
         context.getSharedPreferences(
@@ -111,24 +111,24 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
     val runnable = Runnable {
         if (isToneStarted) {
             toneG?.release()
-            if (sharedPreference?.getBoolean(PrefKey.isMute, false)) {
+          /*  if (sharedPreference?.getBoolean(PrefKey.isMute, false)) {
                 //mute
                 toneG = ToneGenerator(AudioManager.STREAM_MUSIC, 0)
-            } else {
+            } else {*/
                 toneG = ToneGenerator(AudioManager.STREAM_MUSIC, frequency)
-            }
+            //}
 
             toneG?.startTone(ToneGenerator.TONE_DTMF_1, duration.toInt())
 
             restart()
         }
     }
-
-    private fun restart() {
-
-        Thread.sleep((duration + 10) * 2)
-        handler.postDelayed(runnable, 10)
-
+   private fun restart() {
+           if(duration==60000L) {
+               handler.postDelayed(runnable, duration+10)
+           }else{
+               handler.postDelayed(runnable, (duration + 10) * 2)
+           }
     }
 
     var isToneStarted = false;
@@ -138,6 +138,7 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
         calculateToneProps(height)
 
         if (!isToneStarted) {
+            handler.removeCallbacks(runnable)
             isToneStarted = true
             handler.postDelayed(runnable, 0)
         }

@@ -1,13 +1,15 @@
 package com.sachtech.stadia
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.media.AudioManager
 import android.media.ToneGenerator
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.musify.audioplayer.AudioPlayerManager
-import com.sachtech.stadia.utils.*
+import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_description.*
 
 class StadiaActivity : BaseActivity(), View.OnClickListener {
@@ -77,14 +79,11 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
 
 
     fun mute_unmute() {
-        if (sharedPreference?.getBoolean(
-                PrefKey.VoiceAlert,
-                false
-            ) == true || sharedPreference?.getBoolean(PrefKey.SoundAlert, false) == true
-        ) {
-            btn_mute.isEnabled = true
-            btn_unMute.isEnabled = true
-            if (sharedPreference?.getBoolean(PrefKey.isMute, false)) {
+        val audioManager: AudioManager =
+            this@StadiaActivity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (audioManager.isStreamMute(AudioManager.STREAM_MUSIC)) {
                 //mute
                 btn_mute.isEnabled = false
                 btn_unMute.isEnabled = true
@@ -93,9 +92,10 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                 btn_unMute.isEnabled = false
             }
         } else {
-            btn_mute.isEnabled = false
+            btn_mute.isEnabled = true
             btn_unMute.isEnabled = false
         }
+
 
     }
 
@@ -120,7 +120,17 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                 btn_mute.isEnabled = false
                 btn_unMute.isEnabled = true
 
-
+                val audioManager: AudioManager =
+                    this@StadiaActivity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    audioManager.adjustStreamVolume(
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_MUTE,
+                        0
+                    )
+                } else {
+                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true)
+                };
             }
             R.id.btn_unMute -> {
 
@@ -128,6 +138,18 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                 sharedPreference.edit()?.putBoolean(PrefKey.isMute, false)?.apply()
                 btn_mute.isEnabled = true
                 btn_unMute.isEnabled = false
+                val audioManager: AudioManager =
+                    this@StadiaActivity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    audioManager.adjustStreamVolume(
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_UNMUTE,
+                        0
+                    )
+                } else {
+                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
+                };
             }
 
         }

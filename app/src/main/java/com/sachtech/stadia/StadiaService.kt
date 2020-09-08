@@ -49,7 +49,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
                         })
                         if (heightAllert.first) {
                             val distanceInCm = getHeightAfterCalibrate(distance.toInt())
-                            //playHeightAlert(distanceInCm)
+                            playHeightAlert(distanceInCm)
                         } else {
                             audioPlayerManager.stopMedaiPlayer()
                         }

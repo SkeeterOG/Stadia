@@ -3,6 +3,7 @@ package com.sachtech.stadia
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
+import android.os.Handler
 import android.widget.RadioButton
 import android.widget.SeekBar
 import com.musify.audioplayer.AudioPlayerManager
@@ -97,7 +98,8 @@ class SettingsActivity : BaseActivity() {
         btn_play.setOnClickListener {
             val toneG = ToneGenerator(AudioManager.STREAM_MUSIC, 300)
             toneG?.startTone(ToneGenerator.TONE_DTMF_1, 10000)
-           // audioPlayerManager.startMediaPlayer(2625)
+            /*audioPlayerManager.stopMedaiPlayer()
+            audioPlayerManager.startMediaPlayer(20)*/
         }
 
     }
