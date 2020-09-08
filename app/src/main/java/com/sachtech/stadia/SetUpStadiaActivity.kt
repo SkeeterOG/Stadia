@@ -8,12 +8,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.sachtech.stadia.utils.PrefKey
 import com.sachtech.stadia.utils.cmtoInches
 import com.sachtech.stadia.utils.openA
 import com.sachtech.stadia.utils.uptoTwoDecimal
 import kotlinx.android.synthetic.main.activity_setupstadia.*
+import kotlin.math.roundToInt
 
 class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
     private val REQUEST_ACCESS_COARSE_LOCATION = 1022 // random number
@@ -39,7 +41,7 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
                 tv_CurrentOffsetValue.text=calibrate_value.toDouble().cmtoInches().toString().uptoTwoDecimal()
             }
 
-            sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,tv_CurrentOffsetValue.text.toString().toInt()).apply()
+            sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,tv_CurrentOffsetValue.text.toString().toDouble().roundToInt()).apply()
         }
     }
 
@@ -53,7 +55,11 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
 
         }
     }
-    override fun onReceivedData(height: String, battery: String) {
+    override fun onReceivedData(
+        height: String,
+        battery: String,
+        alert: Boolean
+    ) {
         onConnect()
     }
 
@@ -138,9 +144,13 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
             R.id.btn_settings -> openA<SettingsActivity>()
             R.id.btn_runstadia -> openA<StadiaActivity>()
             R.id.btn_enter -> {
-
-                tv_CurrentOffsetValue.text = et_inches.text.toString()
-                sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,et_inches.text.toString().toInt()).apply()
+                if (et_inches.text.isEmpty()) {
+                        Toast.makeText(this,"Please enter height",Toast.LENGTH_SHORT).show()
+                } else {
+                    tv_CurrentOffsetValue.text = et_inches.text.toString()
+                    sharedPreference.edit()
+                        .putInt(PrefKey.HEIGHT_OFFSET, et_inches.text.toString().toInt()).apply()
+                }
             }
         }
     }

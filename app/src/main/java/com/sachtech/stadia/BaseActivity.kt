@@ -8,7 +8,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.sachtech.stadia.utils.*
 import com.sachtech.stadia.utils.BluetoothConnector.BROADCAST_CONNECT_DEVICE
-import kotlin.math.roundToInt
 
 abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     val sharedPreference: SharedPreferences by lazy {
@@ -36,16 +35,13 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothConnector.BROADCAST_DEVICE_CONNECTED)
         intentFilter.addAction(BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED)
-        intentFilter.addAction(BluetoothConnector.bluetooth_receiver)
+        intentFilter.addAction(BluetoothConnector.BROADCAST_CALCULATED_DATA)
         registerReceiver(broadCastReceiver, intentFilter)
 
     }
 
     val broadCastReceiver = object : BroadcastReceiver() {
         override fun onReceive(contxt: Context?, intent: Intent?) {
-
-            val distance = intent?.getStringExtra("distance") ?: "0"
-            val battery = intent?.getStringExtra("battery") ?: "0"
 
 
             runOnUiThread {
@@ -57,9 +53,14 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                         onDisconnect()
                     }
 
-                    BluetoothConnector.bluetooth_receiver -> {
-                        onReceivedData(distance, battery)
-                        isHeightAllert(distance.toInt().toDouble())
+                    BluetoothConnector.BROADCAST_CALCULATED_DATA -> {
+                        val distance = intent?.getStringExtra("distance") ?: "0"
+                        val battery = intent?.getStringExtra("battery") ?: "0"
+                        val isAlert = intent?.getBooleanExtra("isAlert",false) ?: false
+
+
+                        onReceivedData(distance, battery,isAlert)
+
                     }
 
                 }
@@ -68,7 +69,11 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         }
     }
 
-    abstract fun onReceivedData(height: String, battery: String)
+    abstract fun onReceivedData(
+        height: String,
+        battery: String,
+        alert: Boolean
+    )
     abstract fun onConnect()
     abstract fun onDisconnect()
 

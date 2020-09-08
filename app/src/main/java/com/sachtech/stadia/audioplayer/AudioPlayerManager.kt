@@ -106,7 +106,7 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
 
     val handler by lazy { Handler(context.mainLooper) }
     var duration = 1000L;
-    var volume = 500;
+    var frequency = 500;
     var toneG: ToneGenerator? = null
     val runnable = Runnable {
         if (isToneStarted) {
@@ -115,7 +115,7 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
                 //mute
                 toneG = ToneGenerator(AudioManager.STREAM_MUSIC, 0)
             } else {
-                toneG = ToneGenerator(AudioManager.STREAM_MUSIC, volume)
+                toneG = ToneGenerator(AudioManager.STREAM_MUSIC, frequency)
             }
 
             toneG?.startTone(ToneGenerator.TONE_DTMF_1, duration.toInt())
@@ -209,30 +209,30 @@ class AudioPlayerManager(val context: Context) : AudioManager.OnAudioFocusChange
     private fun calculateToneProps(height: Int) {
 
         if (height > 1219) {
-            volume = 270
+            frequency = 270
             duration = 600
         } else if (height in 914..1218) {
-            volume = 510
+            frequency = 510
             duration = 400
 
         } else if (height in 610..914) {
-            volume = 760
+            frequency = 760
             duration = 300
 
         } else if (height in 305..610) {
-            volume = 1020
+            frequency = 1020
             duration = 300
 
         } else if (height in 152..305) {
-            volume = 1220
+            frequency = 1220
             duration = 200
 
         } else if (height in 30..152) {
-            volume = 1350
+            frequency = 1350
             duration = 100
 
         } else if (height < 30) {
-            volume = 1400
+            frequency = 1400
             duration = 60000
 
         }

@@ -7,6 +7,7 @@ import android.app.Service
 import android.bluetooth.BluetoothDevice
 import android.content.*
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
@@ -40,11 +41,25 @@ class StadiaService : Service(), BluetoothConnectionListener {
                 BluetoothConnector.bluetooth_receiver -> {
                     if (!distance.isEmpty() && !distance.contains("STANDBY")) {
 
-                        if (isHeightAllert(distance.toInt())) {
-                            playHeightAlert(distance.toInt())
+                        val heightAllert = isHeightAllert(distance.toInt())
+                        sendBroadcastAction(BluetoothConnector.BROADCAST_CALCULATED_DATA,Bundle().apply {
+                            this.putBoolean("isAlert",heightAllert.first)
+                            this.putString("distance",heightAllert.second.toString().uptoTwoDecimal())
+                            this.putString("battery",battery)
+                        })
+                        if (heightAllert.first) {
+                            val distanceInCm = getHeightAfterCalibrate(distance.toInt())
+                            //playHeightAlert(distanceInCm)
                         } else {
                             audioPlayerManager.stopMedaiPlayer()
                         }
+                    }else{
+                        sendBroadcastAction(BluetoothConnector.BROADCAST_CALCULATED_DATA,Bundle().apply {
+                            this.putBoolean("isAlert",false)
+                            this.putString("distance",distance)
+                            this.putString("battery",battery)
+                        })
+
                     }
                 }
 
@@ -92,6 +107,12 @@ class StadiaService : Service(), BluetoothConnectionListener {
         sendBroadcast(intent)
     }
 
+    fun sendBroadcastAction(action: String?, data: Bundle) {
+        val intent = Intent(action)
+        intent.putExtras(data)
+        sendBroadcast(intent)
+    }
+
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
         sendBroadcastAction(BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED)
     }
@@ -100,21 +121,38 @@ class StadiaService : Service(), BluetoothConnectionListener {
         bluetoothConnector.connect(device)
     }
 
-    fun isHeightAllert(heightInt: Int): Boolean {
+    fun getHeightAfterCalibrate(heightInt: Int): Int {
+        if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
+            val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0))
+
+            return i
+        } else {
+            val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(
+                PrefKey.HEIGHT_OFFSET,
+                0
+            )).toInt().inchestocm()
+
+
+            return i
+
+        }
+    }
+
+    fun isHeightAllert(heightInt: Int): Pair<Boolean, Double> {
         if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
             val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).toDouble()
                 .cmtoMeters()
             if (i < 0)
-                return false
-            return i <= sharedPreference.getInt(PrefKey.seekbarValue, 0)
+                return Pair(false, i)
+            return Pair(i <= sharedPreference.getInt(PrefKey.seekbarValue, 0), i)
         } else {
             val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(
                 PrefKey.HEIGHT_OFFSET,
                 0
             )).inchestoFeet()
             if (i < 0)
-                return false
-            return i <= sharedPreference.getInt(PrefKey.seekbarValue, 0)
+                return Pair(false, i)
+            return Pair(i <= sharedPreference.getInt(PrefKey.seekbarValue, 0), i)
 
         }
 
@@ -147,7 +185,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
                         }
                         Handler(this.mainLooper).postDelayed({
                             isSpeeking = false
-                        },500)
+                        }, 500)
 
                     }
                 }

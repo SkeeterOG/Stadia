@@ -17,6 +17,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.sachtech.stadia.BluetoothConnectionListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ public class BluetoothConnector {
     public static final String BROADCAST_CONNECT_DEVICE = "BROADCAST_CONNECT_DEVICE";
     public static final String BROADCAST_DEVICE_CONNECTED = "BROADCAST_DEVICE_CONNECTED";
     public static final String BROADCAST_DEVICE_DISCONNECTED = "BROADCAST_DEVICE_DISCONNECTED";
+    public static final String BROADCAST_CALCULATED_DATA="BROADCAST_CALCULATED_DATA";
     private Context context;
     // private BluetoothSocketWrapper bluetoothSocket;
     private BluetoothSocket mBluetoothSocket;
@@ -45,6 +47,7 @@ public class BluetoothConnector {
 
 
    private static BluetoothConnector bluetoothConnector;
+
 
     public static BluetoothConnector getInstance(Context context) {
         if (bluetoothConnector == null)
@@ -104,7 +107,7 @@ public class BluetoothConnector {
 
     private void sendInfoCommand() {
         try {
-            Thread.sleep(200);
+            Thread.sleep(1000);
             SharedPreferences sharedPreferences = context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE);
             if(sharedPreferences!=null) {
                 sendData(sharedPreferences.getString(PrefKey.INSTANCE.getDATA_COMMAND(),"0"));

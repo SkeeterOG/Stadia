@@ -36,3 +36,7 @@ fun Double.inchestoFeet():Double{
     return (this/12.0)
 
 }
+fun Int.inchestocm():Int{
+    return (this*2.54).roundToInt()
+
+}

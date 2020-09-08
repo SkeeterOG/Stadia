@@ -2,17 +2,12 @@ package com.sachtech.stadia
 
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.os.Build
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
-import android.util.Log
 import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.SeekBar
 import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_settings.*
-import java.util.*
 
 
 class SettingsActivity : BaseActivity() {
@@ -122,7 +117,11 @@ class SettingsActivity : BaseActivity() {
     }
 
 
-    override fun onReceivedData(height: String, battery: String) {
+    override fun onReceivedData(
+        height: String,
+        battery: String,
+        alert: Boolean
+    ) {
 
     }
 

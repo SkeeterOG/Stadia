@@ -29,7 +29,11 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
 
 
     @SuppressLint("SetTextI18n")
-    override fun onReceivedData(height: String, battery: String) {
+    override fun onReceivedData(
+        height: String,
+        battery: String,
+        alert: Boolean
+    ) {
         if (height.isNotEmpty()) {
             val devicestatus =
                 if (sharedPreference.getString(PrefKey.DATA_COMMAND, "0") == "0") "48" else "49"
@@ -39,33 +43,18 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
                 tv_heightftvalue.text = "" + height
                 tv_warning.visibility = View.GONE
             } else {
-                var heightInt: Double = height.toInt().toDouble()
-                if (isHeightAllert(heightInt)) {
+
+                if (alert) {
                     if (sharedPreference?.getBoolean(PrefKey.VisualAlert, false)) {
                         tv_warning.visibility = View.VISIBLE
                     }
                 } else {
                     tv_warning.visibility = View.GONE
                 }
-                if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
-                    heightInt -= sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
-                    if (heightInt <= 0) {
-                        tv_heightftvalue.text = "0"
-                    } else
-                        tv_heightftvalue.text =
-                            "" + (heightInt.toDouble().cmtoMeters()).toString().uptoTwoDecimal()
-                } else {
-                    heightInt = heightInt.toDouble()
-                        .cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)
-                    if (heightInt <= 0) {
-                        tv_heightftvalue.text = "0"
-                    } else
-                        tv_heightftvalue.text =
-                            "" + (heightInt.inchestoFeet()).toString().uptoTwoDecimal()
-                }
 
-
+                tv_heightftvalue.text = "" + height
             }
+
 
         } else {
             val devicestatus =
