@@ -32,7 +32,7 @@ class SettingsActivity : BaseActivity() {
             val selectedRadioButtonId: Int = radioGroup.checkedRadioButtonId
             when (radioGroup.checkedRadioButtonId) {
                 R.id.radioMetric -> {
-                    sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, false).apply()
+                    sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, true).apply()
                 }
                 R.id.radioImperical -> {
                     sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, false).apply()
@@ -109,7 +109,7 @@ class SettingsActivity : BaseActivity() {
             tv_alertHeight.text = "Alert Height Adjustment(meter)"
 
         } else {
-            tv_alertHeight.text = "Alert Height Adjustment(inches)"
+            tv_alertHeight.text = "Alert Height Adjustment(feet)"
         }
     }
 

@@ -38,7 +38,7 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
             if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,false)){
                 tv_CurrentOffsetValue.text=calibrate_value.toString()
             } else{
-                tv_CurrentOffsetValue.text=calibrate_value.toDouble().cmtoInches().toString().uptoTwoDecimal()
+                tv_CurrentOffsetValue.text=calibrate_value.toDouble().cmtoInches().roundToInt().toString()
             }
 
             sharedPreference.edit().putInt(PrefKey.HEIGHT_OFFSET,tv_CurrentOffsetValue.text.toString().toDouble().roundToInt()).apply()

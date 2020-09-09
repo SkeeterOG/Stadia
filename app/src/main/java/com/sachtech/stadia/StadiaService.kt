@@ -54,6 +54,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
                             audioPlayerManager.stopMedaiPlayer()
                         }
                     }else{
+                        audioPlayerManager.stopMedaiPlayer()
                         sendBroadcastAction(BluetoothConnector.BROADCAST_CALCULATED_DATA,Bundle().apply {
                             this.putBoolean("isAlert",false)
                             this.putString("distance",distance)
