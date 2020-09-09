@@ -6,7 +6,7 @@
     <string name="tap_button_to_connect_to_stadia_via_bluetooth">Tap button to connect to STADIA via BlueTooth</string>
     <string name="once_connected_press_calibrate_button_to_automatically_calculate_offset_height">Once connected, press CALIBRATE button to automatically calculate offset height.</string>
     <string name="calibrate">CALIBRATE</string>
-    <string name="manually_enter_it_yourself_in_inches">Manually enter it yourself in Inches</string>
+    <string name="manually_enter_it_yourself_in_inches">Manually enter it yourself</string>
     <string name="enter">ENTER</string>
     <string name="settings">SETTINGS</string>
     <string name="run_stadia">RUN STADIA</string>
@@ -22,6 +22,7 @@
     <string name="not_connected">Not Connected</string>
     <string name="bluetooth_devices">Bluetooth Devices</string>
     <string name="currentoffset_in_inches">Current Offset In Inches</string>
+    <string name="currentoffset_in_centimeters">Current Offset In centimeters</string>
     <string name="inches">Inches</string>
     <string name="connected">Connected</string>
     <string name="metric">Metric</string>

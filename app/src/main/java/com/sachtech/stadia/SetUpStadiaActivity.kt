@@ -49,9 +49,11 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
         super.onResume()
         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement,false)){
             et_inches.hint="Cm"
+            tv_CurrentOffset.text=getString(R.string.currentoffset_in_centimeters)
         }
         else{
             et_inches.hint="Inches"
+            tv_CurrentOffset.text=getString(R.string.currentoffset_in_inches)
 
         }
     }

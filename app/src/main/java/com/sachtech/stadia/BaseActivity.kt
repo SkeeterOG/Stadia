@@ -57,8 +57,6 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
                         val distance = intent?.getStringExtra("distance") ?: "0"
                         val battery = intent?.getStringExtra("battery") ?: "0"
                         val isAlert = intent?.getBooleanExtra("isAlert",false) ?: false
-
-
                         onReceivedData(distance, battery,isAlert)
 
                     }
@@ -68,7 +66,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
         }
     }
-
+  // method to reflect ui when data received
     abstract fun onReceivedData(
         height: String,
         battery: String,
@@ -77,38 +75,15 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
     abstract fun onConnect()
     abstract fun onDisconnect()
 
-     fun isHeightAllert(heightInt: Double): Boolean {
-         if(sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)){
-             val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).toDouble().cmtoMeters()
-             if(i<0)
-                 return false
-             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
-         }
-         else{
-             val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).inchestoFeet()
-             if(i<0)
-                 return false
-             return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
-
-         }
-
-/*
-
-        val i = (heightInt - sharedPreference.getInt(PrefKey.Height_Inches, 0))* 0.0328
-         if(i.toInt()==0)
-             return false
-        return i <=sharedPreference.getInt(PrefKey.seekbarValue,0)
-*/
-
-    }
-
     override fun onPause() {
         super.onPause()
+        // register receiver to handle the response from device
         unregisterReceiver(pairedBluetoothReceiver)
         unregisterReceiver(broadCastReceiver)
     }
 
     fun connectBt(device: BluetoothDevice) {
+        // send broad cast tos service to connect device
        val intent=Intent(BROADCAST_CONNECT_DEVICE)
         intent.putExtra("device",device)
        sendBroadcast(intent)

@@ -73,41 +73,38 @@ public class BluetoothConnector {
             this.uuidCandidates = new ArrayList<>();
             this.uuidCandidates.add(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"));
         }
-        boolean success = false;
-        //if (selectSocket()) {
-        // adapter.cancelDiscovery();
-        try {
-            //bluetoothSocket.connect();
-            // if (adapter.isEnabled()) {
+         try {
             if (uuids != null) {
+                // create socket between phone and bluetooth device
                 mBluetoothSocket = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
+                // connect socket
                 mBluetoothSocket.connect();
-                mHandler1.sendEmptyMessage(0);
+
+                // start input thread
                 inputThread = new InputThread(mBluetoothSocket);
                 inputThread.start();
+
+                // add some delay and send first command to device
                 Thread.sleep(150);
                 sendInfoCommand();
             }
 
-            // }
-            success = true;
-
+            // send response back that device is connected
             viewListener.onDeviceConnect(device);
         } catch (Exception e) {
-            //mBluetoothSocket = null;
+             // send response back that device is not connected
             viewListener.onDIsconnect(e.getLocalizedMessage());
         }
-/*
-        if (!success) {
-            throw new IOException("Could not connect to device: "+ device.getAddress());
-        }*/
+
         return mBluetoothSocket;
     }
 
 
     private void sendInfoCommand() {
         try {
-            Thread.sleep(1000);
+            // add delay before send data to device
+            Thread.sleep(200);
+            // check the mode command and send to device
             SharedPreferences sharedPreferences = context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE);
             if(sharedPreferences!=null) {
                 sendData(sharedPreferences.getString(PrefKey.INSTANCE.getDATA_COMMAND(),"0"));
@@ -118,28 +115,8 @@ public class BluetoothConnector {
         }
        }
 
-    private boolean selectSocket() throws IOException {
-        if (candidate >= uuidCandidates.size()) {
-            return false;
-        }
-
-        BluetoothSocket tmp;
-        //   UUID uuid = uuidCandidates.get(candidate++);
-
-        // Log.i("BT", "Attempting to connect to Protocol: "+ Arrays.toString(uuids));
-
-        if (uuids != null) {
-            if (secure) {
-                tmp = device.createRfcommSocketToServiceRecord(uuids[0].getUuid());
-            } else {
-                tmp = device.createInsecureRfcommSocketToServiceRecord(uuids[0].getUuid());
-            }
-            //   bluetoothSocket = new NativeBluetoothSocket(tmp);
-        }
-        return true;
-    }
-
     public void sendData(@NotNull String data) {
+        // create another thread to send command to device
         OutputThread outputThread = new OutputThread();
         outputThread.start();
         try {
@@ -148,127 +125,6 @@ public class BluetoothConnector {
             e.printStackTrace();
             Log.e("send data ex>> ", e.getLocalizedMessage() + "");
         }
-    }
-
-
-    public interface BluetoothSocketWrapper {
-
-        InputStream getInputStream() throws IOException;
-
-        OutputStream getOutputStream() throws IOException;
-
-        String getRemoteDeviceName();
-
-        void connect() throws IOException;
-
-        String getRemoteDeviceAddress();
-
-        void close() throws IOException;
-
-        BluetoothSocket getUnderlyingSocket();
-
-    }
-
-
-    public static class NativeBluetoothSocket implements BluetoothSocketWrapper {
-
-        private BluetoothSocket socket;
-
-        public NativeBluetoothSocket(BluetoothSocket tmp) {
-            this.socket = tmp;
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
-            return socket.getInputStream();
-        }
-
-        @Override
-        public OutputStream getOutputStream() throws IOException {
-            return socket.getOutputStream();
-        }
-
-        @Override
-        public String getRemoteDeviceName() {
-            return socket.getRemoteDevice().getName();
-        }
-
-        @Override
-        public void connect() throws IOException {
-            socket.connect();
-        }
-
-        @Override
-        public String getRemoteDeviceAddress() {
-            return socket.getRemoteDevice().getAddress();
-        }
-
-        @Override
-        public void close() throws IOException {
-            socket.close();
-        }
-
-        @Override
-        public BluetoothSocket getUnderlyingSocket() {
-
-            return socket;
-        }
-
-    }
-
-
-    public static class FallbackBluetoothSocket extends NativeBluetoothSocket {
-
-        private BluetoothSocket fallbackSocket;
-
-        public FallbackBluetoothSocket(BluetoothSocket tmp) throws FallbackException {
-            super(tmp);
-            try {
-                Class<?> clazz = tmp.getRemoteDevice().getClass();
-                Class<?>[] paramTypes = new Class<?>[]{Integer.TYPE};
-                Method m = clazz.getMethod("createRfcommSocket", paramTypes);
-                Object[] params = new Object[]{1};
-                fallbackSocket = (BluetoothSocket) m.invoke(tmp.getRemoteDevice(), params);
-            } catch (Exception e) {
-                throw new FallbackException(e);
-            }
-        }
-
-        @Override
-        public InputStream getInputStream() throws IOException {
-            return fallbackSocket.getInputStream();
-        }
-
-        @Override
-        public OutputStream getOutputStream() throws IOException {
-            return fallbackSocket.getOutputStream();
-        }
-
-
-        @Override
-        public void connect() throws IOException {
-            fallbackSocket.connect();
-        }
-
-
-        @Override
-        public void close() throws IOException {
-            fallbackSocket.close();
-        }
-
-    }
-
-    public static class FallbackException extends Exception {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-
-        public FallbackException(Exception e) {
-            super(e);
-        }
-
     }
 
     class InputThread extends Thread {
@@ -281,7 +137,7 @@ public class BluetoothConnector {
         @Override
         public void run() {
             super.run();
-
+            // start read device data
             receiveData();
 
         }
@@ -296,31 +152,37 @@ public class BluetoothConnector {
 
                     // Keep looping to listen for received messages
                     boolean isContinue = true;
-                    //if(socketInputStream.available()>0) {
-                        while (isContinue) {
+                    while (isContinue) {
                             try {
+                                //read bytes from input buffer
                                 bytes = socketInputStream.read(buffer);
                                 if (bytes != -1) {
                                     String readMessage = new String(buffer, 0, bytes);
-                                    //70|80  "",7,0,|,8.0
+
                                     if (readMessage.contains("|")) {
+                                        // parse the data received from device
                                         String[] arrayString = readMessage.replace("\r\n","").split("\\|");
                                         String distance = arrayString[0];
                                         String battery = arrayString[1];
 
+                                        // prepare and Send the obtained data to the StadiaService
                                         Intent intent = new Intent(bluetooth_receiver);
                                         intent.putExtra("distance", distance);
                                         intent.putExtra("battery", battery);
                                         context.sendBroadcast(intent);
+
+                                        // save the height of device
                                         SharedPreferences sharedPreferences = context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE);
                                         if(!distance.isEmpty()&&!distance.contains("STANDBY"))
                                         sharedPreferences.edit().putInt("Calibrate_value",Integer.parseInt(distance)).apply();
+
+                                        // send command again to get data
                                         sendInfoCommand();
                                     }
                                     Log.e("Reading >> ", readMessage + "");
                                 }
-                                // Send the obtained bytes to the UI Activity via handler
-                               // Log.e("Reading >> ", "no data");
+
+
                             } catch (IOException e) {
                                 isContinue = false;
                                 if (e != null)
@@ -328,10 +190,10 @@ public class BluetoothConnector {
                                 else viewListener.onDIsconnect("Input Socket null");
                                 e.printStackTrace();
                             }
-                            //read bytes from input buffer
+
 
                         }
-                   // }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     if(e!=null)
@@ -365,14 +227,4 @@ public class BluetoothConnector {
         }
     }
 
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler1 = new Handler() {
-        @Override
-        public void handleMessage(@NotNull Message msg) {
-          /*  if(mBluetoothConnectProgressDialog!=null){
-            mBluetoothConnectProgressDialog.dismiss();
-            }*/
-            //  Toast.makeText(, "Device now Connected", Toast.LENGTH_SHORT).show();
-        }
-    };
 }

@@ -18,7 +18,6 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_description)
-
         btn_activeMode.setOnClickListener(this)
         btn_standBy.setOnClickListener(this)
         btn_beep.setOnClickListener(this)
@@ -116,40 +115,17 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
 
                 //mute
                 audioPlayerManager.mute()
-                sharedPreference.edit()?.putBoolean(PrefKey.isMute, true)?.apply()
                 btn_mute.isEnabled = false
                 btn_unMute.isEnabled = true
 
-                val audioManager: AudioManager =
-                    this@StadiaActivity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    audioManager.adjustStreamVolume(
-                        AudioManager.STREAM_MUSIC,
-                        AudioManager.ADJUST_MUTE,
-                        0
-                    )
-                } else {
-                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true)
-                };
+
             }
             R.id.btn_unMute -> {
 
                 audioPlayerManager.unMute()
-                sharedPreference.edit()?.putBoolean(PrefKey.isMute, false)?.apply()
                 btn_mute.isEnabled = true
                 btn_unMute.isEnabled = false
-                val audioManager: AudioManager =
-                    this@StadiaActivity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    audioManager.adjustStreamVolume(
-                        AudioManager.STREAM_MUSIC,
-                        AudioManager.ADJUST_UNMUTE,
-                        0
-                    )
-                } else {
-                    audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
-                };
             }
 
         }
