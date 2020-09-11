@@ -103,11 +103,16 @@ public class BluetoothConnector {
     private void sendInfoCommand() {
         try {
             // add delay before send data to device
-            Thread.sleep(200);
+
+
             // check the mode command and send to device
             SharedPreferences sharedPreferences = context.getSharedPreferences("PREFERENCE_NAME", Context.MODE_PRIVATE);
             if(sharedPreferences!=null) {
-                sendData(sharedPreferences.getString(PrefKey.INSTANCE.getDATA_COMMAND(),"0"));
+                String command = sharedPreferences.getString(PrefKey.INSTANCE.getDATA_COMMAND(), "0");
+                if(command=="0")
+                    Thread.sleep(200);
+                else Thread.sleep(500);
+                sendData(command);
             }
 
         } catch (InterruptedException e) {

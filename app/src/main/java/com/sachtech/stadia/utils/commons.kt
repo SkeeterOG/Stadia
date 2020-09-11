@@ -18,7 +18,7 @@ fun Context.sharedPreferences(){
     var mEditor: SharedPreferences.Editor = mSharedPreferences.edit()
 }
 fun String.uptoTwoDecimal(): String {
-    return String.format("%.2f", this.toDouble());
+    return String.format("%.1f", this.toDouble());
 }
 fun Double.cmtoInches(): Double {
     return (this/2.54).toString().uptoTwoDecimal().toDouble()

@@ -1,14 +1,13 @@
 package com.musify.audioplayer
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.media.*
-import android.media.MediaPlayer.*
-import android.net.Uri
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioManager
+import android.media.AudioTrack
 import android.os.Build
 import android.os.Handler
-import android.util.Log
-import com.sachtech.stadia.utils.PrefKey
+import androidx.core.content.ContextCompat.getSystemService
 
 
 class AudioPlayerManager(val context: Context) {
@@ -20,14 +19,67 @@ class AudioPlayerManager(val context: Context) {
     val handler by lazy { Handler(context.mainLooper) }
     var duration = 1000L;
     var frequency = 500;
-    var toneG: ToneGenerator? = null
+    //var toneG: ToneGenerator? = null
+    var toneG: AudioTrack? = null
     val runnable = Runnable {
         if (isToneStarted) {
             toneG?.release()
-            toneG = ToneGenerator(AudioManager.STREAM_MUSIC, frequency)
+            /*toneG = ToneGenerator(AudioManager.STREAM_MUSIC, frequency)
             toneG?.startTone(ToneGenerator.TONE_DTMF_1, duration.toInt())
+            */
+
+
+            toneG = generateTone(frequency.toDouble(),duration.toInt())
+
+            toneG?.play()
+
             restart()
+
         }
+    }
+
+    private fun generateTone(freqHz: Double, durationMs: Int): AudioTrack? {
+        val count = (44100.0 * 2.0 * (durationMs / 1000.0)).toInt() and 1.inv()
+        val samples = ShortArray(count)
+        var i = 0
+        while (i < count) {
+            val sample =
+                (Math.sin(2 * Math.PI * i / (44100.0 / freqHz)) * 0x7FFF).toShort()
+            samples[i + 0] = sample
+            samples[i + 1] = sample
+            i += 2
+        }
+        // set the volume full
+        setVolumeFull()
+        val track =    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioTrack(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build(),
+                AudioFormat.Builder()
+                    .setSampleRate(44100)
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_STEREO).build(),
+                count * (java.lang.Short.SIZE / 8),
+                AudioTrack.MODE_STATIC,
+                AudioManager.AUDIO_SESSION_ID_GENERATE
+            )
+        }else{
+            AudioTrack(
+                AudioManager.STREAM_MUSIC,
+                44100,
+                AudioFormat.CHANNEL_OUT_STEREO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                count * (java.lang.Short.SIZE / 8),
+                AudioTrack.MODE_STATIC
+            )
+        }
+
+
+
+        track.write(samples, 0, count)
+        return track
     }
    private fun restart() {
        if(isToneStarted) {
@@ -130,6 +182,16 @@ class AudioPlayerManager(val context: Context) {
         } else {
             audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
         };
+    }
+    fun setVolumeFull(){
+        val audioManager: AudioManager =
+            context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+        audioManager!!.setStreamVolume(
+            AudioManager.STREAM_MUSIC,
+            audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+            0
+        )
     }
 
     fun stopMedaiPlayer() {

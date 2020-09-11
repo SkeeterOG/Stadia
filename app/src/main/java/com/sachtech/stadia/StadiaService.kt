@@ -153,7 +153,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
             val i = (heightInt - sharedPreference.getInt(PrefKey.HEIGHT_OFFSET, 0)).toDouble()
                 .cmtoMeters()
             if (i < 0)
-                return Pair(false, i)
+                return Pair(true, 0.0)
             return Pair(i <= sharedPreference.getInt(PrefKey.seekbarValue, 0), i)
         } else {
             val i = (heightInt.toDouble().cmtoInches() - sharedPreference.getInt(
@@ -161,7 +161,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
                 0
             )).inchestoFeet()
             if (i < 0)
-                return Pair(false, i)
+                return Pair(true, 0.0)
             return Pair(i <= sharedPreference.getInt(PrefKey.seekbarValue, 0), i)
 
         }
