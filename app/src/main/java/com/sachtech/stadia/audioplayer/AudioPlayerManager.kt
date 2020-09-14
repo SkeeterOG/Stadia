@@ -49,8 +49,7 @@ class AudioPlayerManager(val context: Context) {
             samples[i + 1] = sample
             i += 2
         }
-        // set the volume full
-        setVolumeFull()
+
         val track =    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AudioTrack(
                 AudioAttributes.Builder()
