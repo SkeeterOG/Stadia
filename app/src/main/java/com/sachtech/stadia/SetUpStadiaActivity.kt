@@ -56,6 +56,10 @@ class SetUpStadiaActivity : BaseActivity(), View.OnClickListener {
             tv_CurrentOffset.text=getString(R.string.currentoffset_in_inches)
 
         }
+
+        if(sharedPreference.getBoolean(PrefKey.isDeviceConnected,false)){
+            onConnect()
+        }else onDisconnect()
     }
     override fun onReceivedData(
         height: String,

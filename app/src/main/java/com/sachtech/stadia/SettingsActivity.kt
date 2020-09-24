@@ -61,6 +61,7 @@ class SettingsActivity : BaseActivity() {
 
             } else {
                 sharedPreference.edit()?.putBoolean(PrefKey.SoundAlert, false)?.apply()
+                audioPlayerManager.stopMedaiPlayer()
 
             }
         }

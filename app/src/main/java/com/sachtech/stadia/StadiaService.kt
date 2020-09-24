@@ -102,12 +102,14 @@ class StadiaService : Service(), BluetoothConnectionListener {
     }
 
     override fun onDeviceConnect(device: BluetoothDevice?) {
-
+        sharedPreference.edit().putBoolean(PrefKey.isDeviceConnected,true).apply()
         sendBroadcastAction(BluetoothConnector.BROADCAST_DEVICE_CONNECTED)
     }
 
     override fun onDIsconnect(error: String?) {
+        sharedPreference.edit().putBoolean(PrefKey.isDeviceConnected,false).apply()
         sendBroadcastAction(BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED)
+        audioPlayerManager.stopMedaiPlayer()
     }
 
     fun sendBroadcastAction(action: String?) {
@@ -122,7 +124,9 @@ class StadiaService : Service(), BluetoothConnectionListener {
     }
 
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
+        sharedPreference.edit().putBoolean(PrefKey.isDeviceConnected,false).apply()
         sendBroadcastAction(BluetoothConnector.BROADCAST_DEVICE_DISCONNECTED)
+        audioPlayerManager.stopMedaiPlayer()
     }
 
     // connect device

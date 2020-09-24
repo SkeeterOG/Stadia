@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.sachtech.stadia.utils.*
 import com.sachtech.stadia.utils.BluetoothConnector.BROADCAST_CONNECT_DEVICE
 
-abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
+abstract class BaseActivity : AppCompatActivity() {
     val sharedPreference: SharedPreferences by lazy {
         getSharedPreferences(
             "PREFERENCE_NAME",
@@ -91,7 +91,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
 
 
-    override fun onDeviceConnect(device: BluetoothDevice?) {
+   /* override fun onDeviceConnect(device: BluetoothDevice?) {
         runOnUiThread {
             onConnect()
         }
@@ -101,7 +101,7 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
 
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
         onDisconnect()
-    }
+    }*/
 
     private val pairedBluetoothReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -138,11 +138,10 @@ abstract class BaseActivity : AppCompatActivity(), BluetoothConnectionListener {
         }
     }
 
-    override fun onDIsconnect(error: String?) {
+   /* override fun onDIsconnect(error: String?) {
         onDisconnect()
 
-    }
-
+    }*/
     override fun onDestroy() {
         super.onDestroy()
 
