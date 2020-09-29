@@ -70,6 +70,9 @@ class StadiaService : Service(), BluetoothConnectionListener {
 
                     }
                 }
+                BluetoothConnector.STOPSOUND->{
+                    audioPlayerManager.stopMedaiPlayer()
+                }
 
             }
 
@@ -91,6 +94,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothConnector.BROADCAST_CONNECT_DEVICE)
         intentFilter.addAction(BluetoothConnector.bluetooth_receiver)
+        intentFilter.addAction(BluetoothConnector.STOPSOUND)
         registerReceiver(broadCastReceiver, intentFilter)
         //startNotification()
         return Service.START_NOT_STICKY
@@ -98,6 +102,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        onDIsconnect("")
         unregisterReceiver(broadCastReceiver)
     }
 
@@ -173,12 +178,14 @@ class StadiaService : Service(), BluetoothConnectionListener {
     }
 
     var isSpeeking = false
+    var tts: TextToSpeech? = null
     fun playHeightAlert(distanceInCm: Int) {
         // check if voice alert is on
+
         if (sharedPreference.getBoolean(PrefKey.VoiceAlert, false)) {
             if (!isSpeeking) {
                 isSpeeking = true;
-                var tts: TextToSpeech? = null
+
                 val onInitListener = TextToSpeech.OnInitListener { status ->
                     if (status != TextToSpeech.ERROR) {
                         tts?.language = Locale.UK
@@ -201,7 +208,7 @@ class StadiaService : Service(), BluetoothConnectionListener {
                 )
             }
 
-        }
+        }else tts?.stop()
         if (sharedPreference.getBoolean(PrefKey.SoundAlert, false)) {
             audioPlayerManager.startMediaPlayer(distanceInCm)
         }

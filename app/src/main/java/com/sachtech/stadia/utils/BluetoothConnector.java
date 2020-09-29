@@ -34,6 +34,7 @@ public class BluetoothConnector {
     public static final String BROADCAST_DEVICE_CONNECTED = "BROADCAST_DEVICE_CONNECTED";
     public static final String BROADCAST_DEVICE_DISCONNECTED = "BROADCAST_DEVICE_DISCONNECTED";
     public static final String BROADCAST_CALCULATED_DATA="BROADCAST_CALCULATED_DATA";
+    public static final String STOPSOUND="STOPSOUND";
     private Context context;
     // private BluetoothSocketWrapper bluetoothSocket;
     private BluetoothSocket mBluetoothSocket;

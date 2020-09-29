@@ -204,9 +204,10 @@ class AudioPlayerManager(val context: Context) {
     }
 
     fun stopMedaiPlayer() {
-        handler.removeCallbacks(runnable)
         isToneStarted = false
+        handler.removeCallbacks(runnable)
         toneG?.release()
+
     }
 
 

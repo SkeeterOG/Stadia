@@ -1,5 +1,6 @@
 package com.sachtech.stadia
 
+import android.content.Intent
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.os.Handler
 import android.widget.RadioButton
 import android.widget.SeekBar
 import com.musify.audioplayer.AudioPlayerManager
+import com.sachtech.stadia.utils.BluetoothConnector
 import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_settings.*
 
@@ -61,7 +63,7 @@ class SettingsActivity : BaseActivity() {
 
             } else {
                 sharedPreference.edit()?.putBoolean(PrefKey.SoundAlert, false)?.apply()
-                audioPlayerManager.stopMedaiPlayer()
+               sendBroadcast(Intent(BluetoothConnector.STOPSOUND))
 
             }
         }
