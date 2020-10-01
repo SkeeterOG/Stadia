@@ -27,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         mDelayHandler = Handler()
-
+          // change display time of splash
         mDelayHandler!!.postDelayed(mRunnable, 3000)
 
         //enableMyLocation()

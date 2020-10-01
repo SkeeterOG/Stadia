@@ -65,7 +65,7 @@ class CustomDialogFragment(val onDeviceListenr:(BluetoothDevice?)->Unit) : Dialo
         getPairingDevices()
         recyclerView_custom_fragment.layoutManager = LinearLayoutManager(context)
         val customFragmentAdapter = CustomFragmentAdapter(deviceItemList) {
-
+             // user click om bluetooth device
             if (it.bondState == 12) {
 
                onDeviceListenr(it)

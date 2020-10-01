@@ -31,13 +31,14 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener {
 
 
         fragmentManager = supportFragmentManager
-        startService(Intent(this,StadiaService::class.java))
+
 
     }
 
     override fun onResume() {
         super.onResume()
         // setupConnection()
+        StadiaService.getInstance(this)
     }
 
 

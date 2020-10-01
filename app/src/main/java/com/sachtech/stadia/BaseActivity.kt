@@ -25,7 +25,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     override fun onResume() {
-
+       StadiaService.getInstance(this)
         super.onResume()
 
         val filter1 = IntentFilter()

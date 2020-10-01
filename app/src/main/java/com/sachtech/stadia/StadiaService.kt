@@ -15,17 +15,30 @@ import androidx.annotation.RequiresApi
 import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.*
 import java.util.*
+import kotlin.coroutines.coroutineContext
 
 
-class StadiaService : Service(), BluetoothConnectionListener {
-    val audioPlayerManager by lazy { AudioPlayerManager(this) }
-    val bluetoothConnector by lazy { BluetoothConnector.getInstance(this) }
+class StadiaService(val context:Context): BluetoothConnectionListener {
+    val audioPlayerManager by lazy { AudioPlayerManager(context) }
+    val bluetoothConnector by lazy { BluetoothConnector.getInstance(context) }
     val sharedPreference: SharedPreferences by lazy {
-        getSharedPreferences(
+        context. getSharedPreferences(
             "PREFERENCE_NAME",
             Context.MODE_PRIVATE
         )
     }
+
+    companion object{
+        var service:StadiaService?=null
+        fun getInstance(context:Context):StadiaService
+        {
+            if(service==null)
+                service= StadiaService(context)
+            return service!!
+        }
+
+    }
+
     val broadCastReceiver = object : BroadcastReceiver() {
         override fun onReceive(contxt: Context?, intent: Intent?) {
 
@@ -80,31 +93,19 @@ class StadiaService : Service(), BluetoothConnectionListener {
         }
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
 
-        return null
-    }
-
-    override fun onCreate() {
-        super.onCreate()
+   init{
         bluetoothConnector.setBluetoothConnetionListener(this)
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothConnector.BROADCAST_CONNECT_DEVICE)
         intentFilter.addAction(BluetoothConnector.bluetooth_receiver)
         intentFilter.addAction(BluetoothConnector.STOPSOUND)
-        registerReceiver(broadCastReceiver, intentFilter)
+       context. registerReceiver(broadCastReceiver, intentFilter)
         //startNotification()
-        return Service.START_NOT_STICKY
+
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        onDIsconnect("")
-        unregisterReceiver(broadCastReceiver)
-    }
+
 
     override fun onDeviceConnect(device: BluetoothDevice?) {
         sharedPreference.edit().putBoolean(PrefKey.isDeviceConnected,true).apply()
@@ -119,13 +120,13 @@ class StadiaService : Service(), BluetoothConnectionListener {
 
     fun sendBroadcastAction(action: String?) {
         val intent = Intent(action)
-        sendBroadcast(intent)
+        context. sendBroadcast(intent)
     }
 
     fun sendBroadcastAction(action: String?, data: Bundle) {
         val intent = Intent(action)
         intent.putExtras(data)
-        sendBroadcast(intent)
+        context.   sendBroadcast(intent)
     }
 
     override fun bluetoothPairError(eConnectException: Exception?, device: BluetoothDevice?) {
@@ -196,14 +197,14 @@ class StadiaService : Service(), BluetoothConnectionListener {
                         } else {
                             tts?.speak(warning, TextToSpeech.QUEUE_FLUSH, null);
                         }
-                        Handler(this.mainLooper).postDelayed({
+                        Handler(context.mainLooper).postDelayed({
                             isSpeeking = false
                         }, 500)
 
                     }
                 }
                 tts = TextToSpeech(
-                    applicationContext,
+                    context,
                     onInitListener
                 )
             }
