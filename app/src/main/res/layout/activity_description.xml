@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFC107">
+    android:background="#FFC107"
+    app:barrierMargin="@dimen/_5dp">
 
     <TextView
         android:id="@+id/tv_heightft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="18dp"
-        android:text="@string/height_ft"
+        android:text="@string/height"
         android:textColor="#000"
-        android:visibility="gone"
         android:textSize="@dimen/_48ssp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,9 +25,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_28sdp"
+        android:text="@string/height"
         android:textColor="#000"
-        android:text="@string/height_ft"
-        android:textSize="@dimen/_42ssp"
+        android:textSize="70.00sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_heightft" />
@@ -35,38 +37,40 @@
         android:id="@+id/tv_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginTop="@dimen/_12sdp"
         android:text="@string/warning_low_altitude"
         android:textColor="#EF3A78"
         android:textSize="@dimen/_28ssp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_heightftvalue" />
 
+
     <TextView
         android:id="@+id/tv_heightbatt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/_12sdp"
-        android:layout_marginTop="@dimen/_6sdp"
-        android:text="@string/height_batt_48_duration_clock2_on_off"
+        android:layout_width="61dp"
+        android:layout_height="97dp"
+        android:layout_marginStart="44dp"
+        android:text="%"
         android:textColor="#000"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_warning" />
+        tools:layout_editor_absoluteY="628dp" />
 
     <LinearLayout
         android:id="@+id/ll_btn_activeStandby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_12sdp"
-        android:layout_marginTop="@dimen/_16sdp"
+        android:layout_marginTop="188dp"
         android:layout_marginEnd="@dimen/_12sdp"
         android:orientation="horizontal"
         android:weightSum="2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_heightbatt">
+        app:layout_constraintTop_toBottomOf="@+id/tv_heightftvalue">
 
         <Button
             android:id="@+id/btn_activeMode"
@@ -91,7 +95,6 @@
 
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/ll_btn_beep_mute_unmute"
         android:layout_width="match_parent"
@@ -112,7 +115,7 @@
             android:layout_marginEnd="@dimen/_8sdp"
             android:layout_weight="1"
             android:background="@drawable/bg_btn_beep_mute_unmute"
-            android:text="@string/beep"
+            android:text="@string/Test"
             android:textAllCaps="false" />
 
         <Button
@@ -137,6 +140,26 @@
             android:textAllCaps="false" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="108dp"
+        android:layout_height="21dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="48dp"
+        android:text="  Stadia Battery"
+        app:layout_constraintBottom_toTopOf="@+id/ll_btn_activeStandby"
+        app:layout_constraintStart_toEndOf="@+id/progressBar" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="58dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="12dp"
+        android:progressDrawable="@drawable/battery_progressbar"
+        app:layout_constraintStart_toStartOf="@+id/ll_btn_activeStandby"
+        app:layout_constraintTop_toTopOf="@+id/textView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

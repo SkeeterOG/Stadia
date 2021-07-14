@@ -4,9 +4,11 @@ import android.content.Intent
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
+import android.media.MediaPlayer
 import android.os.Handler
 import android.widget.RadioButton
 import android.widget.SeekBar
+import android.widget.Toast
 import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.BluetoothConnector
 import com.sachtech.stadia.utils.PrefKey
@@ -14,16 +16,17 @@ import kotlinx.android.synthetic.main.activity_settings.*
 
 
 class SettingsActivity : BaseActivity() {
+    private var mediaPlayer: MediaPlayer? = null
     val audioPlayerManager by lazy { AudioPlayerManager(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         if (sharedPreference?.getBoolean(PrefKey.isMetricMeasurement, false)) {
             radioMetric.isChecked = true
-            radioImperical.isChecked = false
+            radioImperial.isChecked = false
         } else {
             radioMetric.isChecked = false
-            radioImperical.isChecked = true
+            radioImperial.isChecked = true
 
         }
         setUpScrollerTitle();
@@ -34,7 +37,7 @@ class SettingsActivity : BaseActivity() {
                 R.id.radioMetric -> {
                     sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, true).apply()
                 }
-                R.id.radioImperical -> {
+                R.id.radioImperial -> {
                     sharedPreference?.edit().putBoolean(PrefKey.isMetricMeasurement, false).apply()
                 }
             }
@@ -96,9 +99,38 @@ class SettingsActivity : BaseActivity() {
         }
         )
 
+        //Example of Tones
         btn_play.setOnClickListener {
-            val toneG = ToneGenerator(AudioManager.STREAM_MUSIC, 300)
-            toneG?.startTone(ToneGenerator.TONE_DTMF_1, 10000)
+            mediaPlayer = MediaPlayer.create(this, R.raw.stadiaexample)
+            mediaPlayer?.start()
+            Toast.makeText(this, "50ft - 40 ft (15.2m - 12.2m)", Toast.LENGTH_SHORT).show()
+            val handler = Handler()
+            handler.postDelayed({
+                Toast.makeText(this, "40ft - 30ft (12.2m - 9.1m)", Toast.LENGTH_SHORT).show()
+            }, 10)
+            handler.postDelayed({
+                Toast.makeText(this, "30ft - 20ft (9.1m - 6.1m)", Toast.LENGTH_SHORT).show()
+            }, 10)
+            handler.postDelayed({
+                Toast.makeText(this, "20ft - 10ft (6.1m - 3m)", Toast.LENGTH_SHORT).show()
+            }, 10)
+            handler.postDelayed({
+                Toast.makeText(this, "10ft - 3ft (3m - 0.9m)", Toast.LENGTH_SHORT).show()
+            }, 10)
+            handler.postDelayed({
+                Toast.makeText(this, "3ft - 1ft (0.9m - 0.3m)", Toast.LENGTH_SHORT).show()
+            }, 10)
+            handler.postDelayed({
+                Toast.makeText(this, "Less than 1ft (0.3m)", Toast.LENGTH_SHORT).show()
+            }, 10)
+
+
+
+
+
+
+            //val toneG = ToneGenerator(AudioManager.STREAM_MUSIC, 300)
+            //toneG?.startTone(ToneGenerator.TONE_DTMF_1, 10000)
             /*audioPlayerManager.stopMedaiPlayer()
             audioPlayerManager.startMediaPlayer(20)*/
         }

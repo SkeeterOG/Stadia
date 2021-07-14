@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Stadia</string>
-    <string name="beep">Beep</string>
+    <string name="Test">Test</string>
     <string name="mute">Mute</string>
     <string name="unmute">UnMute</string>
     <string name="tap_button_to_connect_to_stadia_via_bluetooth">Tap button to connect to STADIA via BlueTooth</string>
     <string name="once_connected_press_calibrate_button_to_automatically_calculate_offset_height">Once connected, press CALIBRATE button to automatically calculate offset height.</string>
     <string name="calibrate">CALIBRATE</string>
-    <string name="manually_enter_it_yourself_in_inches">Manually enter it yourself</string>
+    <string name="manually_enter_it_yourself_in_inches">Manually Enter Offset</string>
     <string name="enter">ENTER</string>
     <string name="settings">SETTINGS</string>
     <string name="run_stadia">RUN STADIA</string>
@@ -17,7 +17,7 @@
     <string name="standby_mode">StandBy Mode</string>
     <string name="warning_low_altitude">Warning: Low Altitude!</string>
     <string name="_3000">3000</string>
-    <string name="height_ft">Height ft</string>
+    <string name="height">Height</string>
     <string name="setup_stadia">SETUP STADIA</string>
     <string name="not_connected">Not Connected</string>
     <string name="bluetooth_devices">Bluetooth Devices</string>
@@ -26,5 +26,7 @@
     <string name="inches">Inches</string>
     <string name="connected">Connected</string>
     <string name="metric">Metric</string>
-    <string name="imperical">Imperical</string>
+    <string name="imperial">Imperial</string>
+    <string name="tv_Terms_and_Conditions">Users agree to the <a href="https://skeeterenterprises.com/terms-and-conditions">Terms and Conditions</a></string>
+    <string name="tv_Instructions">Click here for <a href="https://skeeterenterprises.com/stadia-instructions">Instructions</a></string>
 </resources>

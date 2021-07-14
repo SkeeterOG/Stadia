@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -22,14 +23,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_16sdp"
         android:layout_marginTop="@dimen/_16sdp"
-        android:layout_marginEnd="@dimen/_16sdp"
         android:text="Turn on Warning:Low Alititude visual alert"
 
         android:textSize="@dimen/_12ssp"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_settings"
 
-        />
+        app:layout_constraintTop_toBottomOf="@+id/tv_settings" />
 
     <CheckBox
         android:id="@+id/checkBox_voiceAlert"
@@ -37,13 +37,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_16sdp"
         android:layout_marginTop="@dimen/_12sdp"
-        android:layout_marginEnd="@dimen/_16sdp"
         android:text="Turn on Warning:Low Alititude voice alert"
         android:textSize="@dimen/_12ssp"
+        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox_VisualAlert"
 
-        />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox_VisualAlert" />
 
     <CheckBox
         android:id="@+id/checkBox_soundAlert"
@@ -51,8 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_16sdp"
         android:layout_marginTop="@dimen/_12sdp"
-        android:layout_marginEnd="@dimen/_16sdp"
-        android:text="Turn on beeping sound alert"
+        android:text="Turn on audible tone alert"
         android:textSize="@dimen/_12ssp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkBox_voiceAlert"
@@ -65,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_16sdp"
         android:layout_marginTop="20dp"
-        android:text="Press Play to here examples of beeping sound alert"
+        android:text="Press Play to hear examples of audible tone alert"
         android:textColor="#000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -118,10 +116,10 @@
      />
 
     <RadioButton
-        android:id="@+id/radioImperical"
+        android:id="@+id/radioImperial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/imperical"
+        android:text="@string/imperial"
         android:checked="false"
         android:layout_marginLeft="@dimen/_10sdp"
 
@@ -132,39 +130,18 @@
 
 
     <TextView
-        android:id="@+id/tv_intervals"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_16sdp"
-        android:layout_marginTop="@dimen/_20sdp"
-        android:text="@string/intervals_are"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
-
-    <TextView
-        android:id="@+id/tv_intervalsValue"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_16sdp"
-        android:layout_marginTop="@dimen/_8sdp"
-        android:text="50ft-40ft"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_intervals" />
-
-    <TextView
         android:id="@+id/tv_alertHeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_16sdp"
-        android:layout_marginTop="@dimen/_8sdp"
+        android:layout_marginTop="52dp"
         android:text="@string/alert_height_adjustment_feet"
         android:textColor="#000"
         android:textSize="@dimen/_16sdp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_intervalsValue" />
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup" />
 
     <SeekBar
         android:id="@+id/seek_bar"

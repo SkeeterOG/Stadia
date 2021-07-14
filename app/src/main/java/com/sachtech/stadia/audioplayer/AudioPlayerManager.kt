@@ -112,39 +112,39 @@ class AudioPlayerManager(val context: Context) {
         }
 
     }
-
+    //Duration D is twice the duration of one tone (Duration = tone + pause)
     //Range = 1524 – 1219 cm (50 – 40 ft): F = 270Hz, D = 400ms
     // Range = 1219 – 914 cm (40 – 30 ft): F = 510Hz, D = 400ms
     // Range = 914 – 610 cm (30 – 20 ft): F = 760Hz, D = 300ms
     // Range = 610 – 305 cm (20 – 10 ft): F = 1020Hz, D = 300ms
-    // Range = 305 – 152 cm (10 – 5 ft): F = 1220Hz, D = 200ms
-    // Range = 152 – 30 cm (5 – 1 ft): F = 1350Hz, D = 100ms
+    // Range = 305 – 91 cm (10 – 3 ft): F = 1220Hz, D = 200ms
+    // Range = 91 – 30 cm (3 – 1 ft): F = 1350Hz, D = 100ms
     // Range < 30 cm (1 ft): F = 1400, D = Constant
     var lastDuration = 0L
     private fun calculateToneProps(height: Int) {
         lastDuration = duration
         if (height > 1219) {
             frequency = 270
-            duration = 600
+            duration = 200
         } else if (height in 914..1218) {
             frequency = 510
-            duration = 400
+            duration = 200
 
         } else if (height in 610..914) {
             frequency = 760
-            duration = 300
+            duration = 150
 
         } else if (height in 305..610) {
             frequency = 1020
-            duration = 300
+            duration = 150
 
-        } else if (height in 152..305) {
+        } else if (height in 91..305) {
             frequency = 1220
-            duration = 200
-
-        } else if (height in 30..152) {
-            frequency = 1350
             duration = 100
+
+        } else if (height in 30..91) {
+            frequency = 1350
+            duration = 50
 
         } else if (height < 30) {
             frequency = 1400

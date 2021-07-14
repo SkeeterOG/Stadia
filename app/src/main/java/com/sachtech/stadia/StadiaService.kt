@@ -53,23 +53,39 @@ class StadiaService(val context:Context): BluetoothConnectionListener {
                 }
                 BluetoothConnector.bluetooth_receiver -> {
                     if (!distance.isEmpty() && !distance.contains("STANDBY")) {
-
-                        val heightAllert = isHeightAllert(distance.toInt())
-                        sendBroadcastAction(
-                            BluetoothConnector.BROADCAST_CALCULATED_DATA,
-                            Bundle().apply {
-                                this.putBoolean("isAlert", heightAllert.first)
-                                this.putString(
-                                    "distance",
-                                    heightAllert.second.toString().uptoTwoDecimal()
-                                )
-                                this.putString("battery", battery)
-                            })
-                        if (heightAllert.first) {
-                            val distanceInCm = getHeightAfterCalibrate(distance.toInt())
-                            playHeightAlert(distanceInCm)
-                        } else {
+                        if (distance == "1"){
+                            val heightAllert = isHeightAllert(distance.toInt())
+                            sendBroadcastAction(
+                                BluetoothConnector.BROADCAST_CALCULATED_DATA,
+                                Bundle().apply {
+                                    this.putBoolean("isAlert", heightAllert.first)
+                                    this.putString(
+                                        "distance",
+                                        "UNKNOWN"
+                                    )
+                                    this.putString("battery", battery)
+                                })
                             audioPlayerManager.stopMedaiPlayer()
+
+                        }
+                        else {
+                            val heightAllert = isHeightAllert(distance.toInt())
+                            sendBroadcastAction(
+                                BluetoothConnector.BROADCAST_CALCULATED_DATA,
+                                Bundle().apply {
+                                    this.putBoolean("isAlert", heightAllert.first)
+                                    this.putString(
+                                        "distance",
+                                        heightAllert.second.toString().uptoTwoDecimal()
+                                    )
+                                    this.putString("battery", battery)
+                                })
+                            if (heightAllert.first) {
+                                val distanceInCm = getHeightAfterCalibrate(distance.toInt())
+                                playHeightAlert(distanceInCm)
+                            } else {
+                                audioPlayerManager.stopMedaiPlayer()
+                            }
                         }
                     } else {
                         audioPlayerManager.stopMedaiPlayer()
@@ -94,13 +110,13 @@ class StadiaService(val context:Context): BluetoothConnectionListener {
     }
 
 
-   init{
+    init{
         bluetoothConnector.setBluetoothConnetionListener(this)
         val intentFilter = IntentFilter()
         intentFilter.addAction(BluetoothConnector.BROADCAST_CONNECT_DEVICE)
         intentFilter.addAction(BluetoothConnector.bluetooth_receiver)
         intentFilter.addAction(BluetoothConnector.STOPSOUND)
-       context. registerReceiver(broadCastReceiver, intentFilter)
+        context. registerReceiver(broadCastReceiver, intentFilter)
         //startNotification()
 
     }

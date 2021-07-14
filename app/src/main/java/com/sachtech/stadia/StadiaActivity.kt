@@ -1,5 +1,6 @@
 package com.sachtech.stadia
 
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.AudioManager
@@ -8,12 +9,15 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import android.widget.ProgressBar
+import com.google.android.gms.common.internal.ServiceSpecificExtraArgs
 import com.musify.audioplayer.AudioPlayerManager
 import com.sachtech.stadia.utils.PrefKey
 import kotlinx.android.synthetic.main.activity_description.*
 
 class StadiaActivity : BaseActivity(), View.OnClickListener {
     val audioPlayerManager by lazy { AudioPlayerManager(this) }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,15 +34,25 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
 
 
     @SuppressLint("SetTextI18n")
+
     override fun onReceivedData(
         height: String,
         battery: String,
         alert: Boolean
     ) {
+
         if (height.isNotEmpty()) {
             val devicestatus =
                 if (sharedPreference.getString(PrefKey.DATA_COMMAND, "0") == "0") "48" else "49"
-            tv_heightbatt.text = "$height $battery $devicestatus"
+            tv_heightbatt.text = "$battery%"
+
+
+            val mbattery: Int = battery.toInt()
+            var progress = mbattery
+            progressBar.progress = progress
+
+
+
 
             if (height.contains("STANDBY", true)) {
                 tv_heightftvalue.text = "" + height
@@ -60,7 +74,7 @@ class StadiaActivity : BaseActivity(), View.OnClickListener {
         } else {
             val devicestatus =
                 if (sharedPreference.getString(PrefKey.DATA_COMMAND, "0") == "0") "48" else "49"
-            tv_heightbatt.text = "$height $battery $devicestatus"
+            tv_heightbatt.text = "$battery%"
         }
 
     }
